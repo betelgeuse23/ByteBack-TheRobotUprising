@@ -6,6 +6,7 @@ int main() {
     sf::RenderWindow window(sf::VideoMode(512, 512), "Metal-Menace", sf::Style::Close | sf::Style::Titlebar);
     window.setFramerateLimit(60);
     sf::Clock clock;
+    bool isShooting = false;
 
     // персонаж
     sf::Image image;
@@ -48,7 +49,7 @@ int main() {
     {
         float time = clock.getElapsedTime().asMicroseconds();
         clock.restart();
-        time = time / 2800;
+        time = time / 3000;
 
         sf::Event event;
         while (window.pollEvent(event))
@@ -61,6 +62,12 @@ int main() {
             }
         }
 
+        // стрельба
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
+            isShooting = true;
+        }
+
+        // перемещение
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
             player.move(-1.0 * time, 0);
 
