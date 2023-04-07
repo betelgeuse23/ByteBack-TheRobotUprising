@@ -16,7 +16,10 @@ int main() {
     player.setTextureRect(sf::IntRect(0, 0, 31, 31));
     player.setPosition(0, 0);
 
-    
+    // enemy
+    Enemy enemy1(texture, sf::Vector2f(4, 4), 100.0);
+    enemy1.draw(window);
+
     // карта
     const int level[] = {
         39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39,
@@ -51,7 +54,7 @@ int main() {
     {
         float time = clock.getElapsedTime().asMicroseconds();
         clock.restart();
-        time = time / 1000;
+        time = time / 100;
         if (!(isMoving)) delay = 0;
         else delay += time;
 
