@@ -54,7 +54,7 @@ int main() {
     {
         float time = clock.getElapsedTime().asMicroseconds();
         clock.restart();
-        time = time / 100;
+        time = time / 1000;
         if (!(isMoving)) delay = 0;
         else delay += time;
 
@@ -92,19 +92,19 @@ int main() {
             dir = 'd';
         }
 
-        if (isMoving && dir == 'n' && delay/1000 > 2) isMoving = false;
+        if (isMoving && dir == 'n' && delay/1000 > 0.5) isMoving = false;
 
         if (isMoving && move < 32 && dir != 'n') {
-            move += 0.025 * time;
+            move += 0.1 * time;
             float k = move > 32 ? move - 32 : 0;
             if (dir == 'u') {
-                player.move(0, -0.025 * time + k);
+                player.move(0, -0.1 * time + k);
             } else if (dir == 'd') {
-                player.move(0, 0.025 * time - k);
+                player.move(0, 0.1 * time - k);
             } else if (dir == 'r') {
-                player.move(0.025 * time - k, 0);
+                player.move(0.1 * time - k, 0);
             } else if (dir == 'l') {
-                player.move(-0.025 * time + k, 0);
+                player.move(-0.1 * time + k, 0);
             }
             player.setTextureRect(sf::IntRect(32 * (int(move/8) % 4), 0, 31, 31));
         }
