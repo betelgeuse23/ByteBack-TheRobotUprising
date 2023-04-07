@@ -1,3 +1,19 @@
+#include "bullet.h"
+
+Bullet::Bullet(sf::Texture& texture, sf::Vector2f position, float speed, float damage, float range)
+    : m_speed(speed), m_damage(damage), m_range(range), m_distanceTravelled(0.0f)
+{
+    // Initialize sprite and set position
+    m_sprite.setTexture(texture);
+    m_sprite.setOrigin(texture.getSize().x / 2.0f, texture.getSize().y / 2.0f);
+    m_sprite.setPosition(position);
+
+    // Calculate velocity based on speed and direction
+    sf::Vector2f direction = /* calculate direction towards target */;
+    float distance = /* calculate distance to target */;
+    m_velocity = direction * (m_speed / distance);
+}
+
 void Bullet::update(sf::Time deltaTime) {
     sprite.move(velocity * deltaTime.asSeconds());
     traveled += speed * deltaTime.asSeconds();
@@ -31,18 +47,4 @@ void Shooter::shoot() {
 
 void Shooter::draw(sf::RenderWindow& window) {
     window.draw(sprite);
-}
-
-Bullet::Bullet(sf::Texture& texture, sf::Vector2f position, float speed, float damage, float range)
-    : m_speed(speed), m_damage(damage), m_range(range), m_distanceTravelled(0.0f)
-{
-    // Initialize sprite and set position
-    m_sprite.setTexture(texture);
-    m_sprite.setOrigin(texture.getSize().x / 2.0f, texture.getSize().y / 2.0f);
-    m_sprite.setPosition(position);
-
-    // Calculate velocity based on speed and direction
-    sf::Vector2f direction = /* calculate direction towards target */;
-    float distance = /* calculate distance to target */;
-    m_velocity = direction * (m_speed / distance);
 }

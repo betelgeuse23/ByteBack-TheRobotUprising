@@ -118,17 +118,3 @@ Node::Node(int x, int y, bool isObstacle) :
     parent(nullptr)
 {
 }
-
-/*void Graph::addNode(Node node) {
-    m_nodes.push_back(node);
-}
-
-void Graph::addEdge(Node node1, Node node2) {
-    // Create a new edge connecting node1 to node2
-    Edge edge1(node2, distance(node1, node2));
-    node1.edges.push_back(edge1);
-
-    // Create a new edge connecting node2 to node1
-    Edge edge2(node1, distance(node1, node2));
-    node2.edges.push_back(edge2);
-}*/
