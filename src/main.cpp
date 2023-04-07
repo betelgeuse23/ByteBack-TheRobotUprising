@@ -16,15 +16,6 @@ int main() {
     player.setTextureRect(sf::IntRect(0, 0, 31, 31));
     player.setPosition(0, 0);
 
-    // пуля
-    sf::Image image_b;
-    image_b.loadFromFile("images/character.png");
-    sf::Texture texture_b;
-    texture_b.loadFromImage(image_b);
-    sf::Sprite bullet;
-    bullet.setTexture(texture_b);
-    bullet.setTextureRect(sf::IntRect(0, 0, 31, 31));
-
     // карта
     const int level[] = {
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -50,10 +41,12 @@ int main() {
         return -1;
 
     bool isMoving = false;
-    bool isShooting = false;
     char dir = 'n';
     float delay;
     float move = 0;
+
+    bool isShooting = false;
+    float bulDelay = 0;
 
     // работа с окном
     while (window.isOpen())
@@ -61,8 +54,12 @@ int main() {
         float time = clock.getElapsedTime().asMicroseconds();
         clock.restart();
         time = time / 300;
+
         if (!(isMoving)) delay = 0;
         else delay += time;
+
+        if (isShooting) bulDelay = 0;
+        else bulDelay += time;
 
         sf::Event event;
         while (window.pollEvent(event))
@@ -74,13 +71,8 @@ int main() {
                 if (event.key.code == sf::Keyboard::Escape) window.close();
             }
         }
-        ;
-        // стрельба
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
-            isShooting = true;
-        }
 
-        // перемещение
+        // обработка нажатий клавиш
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) && !(isMoving)) {
             isMoving = true;
             dir = 'l';
@@ -98,9 +90,13 @@ int main() {
             dir = 'd';
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
-            Bullet bullet(player.getPosition(), dir);
-            bullets.push_back(bullet);
-            isShooting = true;
+            if (bulDelay > 2000)
+            {
+                isShooting = true;
+                Bullet bullet(player.getPosition(), dir, "images/character.png");
+                bullets.push_back(bullet);
+            }
+            else isShooting = false;
         }
 
         if (isMoving && dir == 'n' && delay/1000 > 0.5) isMoving = false;
@@ -125,17 +121,12 @@ int main() {
             player.setTextureRect(sf::IntRect(0, 0, 31, 31));
         }
 
-        if (isShooting && delay / 1000 < 0.5)
-        {
-            for (auto& elem : bullets)
-                bullet.setPosition(elem.update(0.025 * time));
-        }
-
         window.clear(sf::Color::Black);
         window.draw(map);
         window.draw(player);
         for (auto& elem : bullets) { 
-            window.draw(bullet);
+            elem.getSprite().setPosition(elem.update(0.025 * time));
+            window.draw(elem.getSprite());
         }
         window.display();
     }
