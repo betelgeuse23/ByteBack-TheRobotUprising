@@ -3,34 +3,26 @@
 Enemy::Enemy(sf::Texture& texture, sf::Vector2f position, float speed)
 {
     // Set the texture and initial position of the enemy
-    m_sprite.setTexture(texture);
-    m_sprite.setPosition(position);
+    sprite.setTexture(texture);
+    sprite.setPosition(position);
 
-    // Set the speed of the enemy
-    m_speed = speed;
-
-    // Set the initial direction of the enemy to Up
-    m_direction = Direction::Up;
-
-    // Set the initial state of the enemy to Alive
-    m_state = State::Alive;
-
-    // Set the initial health of the enemy
-    m_health = 10;
-
-    // Set the initial damage of the enemy's bullets
-    m_bulletDamage = 10;
+    this->position = position;
+    this->direction = Direction::Up;
+    this->speed = speed;
+    this->state = State::Alive;
+    this->health = 10;
+    this->damage = 10;
 }
 
-void Enemy::update(sf::Time deltaTime, const std::vector<int>& level, int playerX, int playerY) {
+void Enemy::update(sf::Time deltaTime, const std::vector<int> level, int playerX, int playerY) {
     // Move the enemy towards the player
-    std::vector<sf::Vector2i> path = findShortestPath(level, getPosition(), sf::Vector2i(playerX, playerY));
+    std::vector<sf::Vector2i> path = findShortestPath(new Node(this->position.x, this->position.y, false), new Node(playerX, playerY, false), level);
     if (!path.empty()) {
         // The first element in the path is the enemy's next target position
         sf::Vector2i nextPosition = path[0];
 
         // Calculate the direction of movement
-        sf::Vector2i direction = nextPosition - getPosition();
+        sf::Vector2i direction = nextPosition - sf::Vector2i(this->position);
         if (direction.x != 0) {
             direction.x /= std::abs(direction.x);
         }
@@ -39,20 +31,20 @@ void Enemy::update(sf::Time deltaTime, const std::vector<int>& level, int player
         }
 
         // Calculate the new position
-        sf::Vector2f position = getPosition();
-        position.x += mSpeed * direction.x * deltaTime.asSeconds();
-        position.y += mSpeed * direction.y * deltaTime.asSeconds();
+        sf::Vector2f position = this->position;
+        position.x += speed * direction.x * deltaTime.asSeconds();
+        position.y += speed * direction.y * deltaTime.asSeconds();
 
         // Update the enemy's position
-        setPosition(position);
+        this->position = position;
     }
 }
 
 void Enemy::draw(sf::RenderWindow& window) {
-    window.draw(m_sprite);
+    window.draw(sprite);
 }
 
-void Enemy::findShortestPath(Node* startNode, Node* targetNode, const int* obstacles) {
+std::vector<sf::Vector2i> Enemy::findShortestPath(Node* startNode, Node* targetNode, const std::vector<int> obstacles) {
     // create a 2D array of nodes to represent the game board
     Node* board[16][16];
     for (int i = 0; i < 16; i++) {
@@ -106,6 +98,15 @@ void Enemy::findShortestPath(Node* startNode, Node* targetNode, const int* obsta
         }
     }
 
+    std::vector<sf::Vector2i> path;
+    path.push_back(sf::Vector2i(targetNode->x, targetNode->y));
+    while (targetNode->parent) {
+        path.push_back(sf::Vector2i(targetNode->parent->x, targetNode->parent->y));
+        targetNode = targetNode->parent;
+    }
+
+    return path;
+
     // once we've found the shortest path, you can navigate your enemy along it using the `parent` property of each node
 }
 
@@ -116,5 +117,4 @@ Node::Node(int x, int y, bool isObstacle) :
     distanceFromStart(INT_MAX),
     visited(false),
     parent(nullptr)
-{
-}
+{}

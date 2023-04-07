@@ -1,15 +1,7 @@
-class Enemy {
-public:
-    Enemy(sf::Texture& texture, sf::Vector2f position, float speed);
+#pragma once
 
-    void update(sf::Time deltaTime, const std::vector<int>& level, int playerX, int playerY);
-    void draw(sf::RenderWindow& window);
-    void findShortestPath(Node* startNode, Node* targetNode, const int* obstacles);
-
-private:
-    sf::Sprite sprite;
-    sf::Vector2f position;
-};
+#include <SFML/Graphics.hpp>
+#include <queue>
 
 class Node {
 public:
@@ -20,3 +12,24 @@ public:
     bool visited; // true if this node has been visited in the pathfinding algorithm
     Node* parent; // the previous node in the shortest path
 };
+
+class Enemy {
+public:
+    Enemy(sf::Texture& texture, sf::Vector2f position, float speed);
+
+    void update(sf::Time deltaTime, const std::vector<int> level, int playerX, int playerY);
+    void draw(sf::RenderWindow& window);
+    std::vector<sf::Vector2i> findShortestPath(Node* startNode, Node* targetNode, const std::vector<int> obstacles);
+
+private:
+    enum Direction { Up, Down, Left, Right };
+    enum State { Alive,Dead };
+    sf::Sprite sprite;
+    sf::Vector2f position;
+    float speed;
+    Direction direction;
+    State state;
+    float health;
+    float damage;
+};
+
