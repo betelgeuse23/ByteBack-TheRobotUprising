@@ -5,6 +5,7 @@ Enemy::Enemy(sf::Texture& texture, sf::Vector2f position, float speed)
     // Set the texture and initial position of the enemy
     sprite.setTexture(texture);
     sprite.setPosition(position);
+    sprite.setTextureRect(sf::IntRect(0, 0, 31, 31));
 
     this->position = position;
     this->direction = Direction::Up;
