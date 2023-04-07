@@ -2,34 +2,49 @@
 
 #include <SFML/Graphics.hpp>
 #include <queue>
+#include <cmath>
+#include <iostream>
+#include <vector>
 
-class Node {
+const int WIDTH = 600;
+const int HEIGHT = 600;
+const int CELL_SIZE = 32;
+const int GRID_WIDTH = WIDTH / CELL_SIZE;
+const int GRID_HEIGHT = HEIGHT / CELL_SIZE;
+const int INF = INT_MAX;
+
+class Cell {
 public:
-    Node(int x, int y, bool isObstacle);
-    int x, y; // position on the board
-    bool isObstacle; // true if this node is an obstacle
-    int distanceFromStart; // distance from starting point
-    bool visited; // true if this node has been visited in the pathfinding algorithm
-    Node* parent; // the previous node in the shortest path
+    int x, y;
+    int gCost, hCost, fCost;
+    bool obstacle, visited;
+    Cell* parent;
+
+    Cell();
+    Cell(int x, int y, bool obstacle);
+    int getDistance(Cell* other);
+};
+
+struct CompareCells {
+    bool operator()(const Cell* lhs, const Cell* rhs) const {
+        return lhs->fCost > rhs->fCost;
+    }
 };
 
 class Enemy {
 public:
-    Enemy(sf::Texture& texture, sf::Vector2f position, float speed);
+    sf::RectangleShape shape;
+    std::vector<Cell*> path;
+    int pathIndex;
+    bool isActive;
 
-    void update(sf::Time deltaTime, const int* level, int playerX, int playerY);
+    Enemy(sf::Vector2f position, sf::Color color);
+    void update();
     void draw(sf::RenderWindow& window);
-    std::vector<sf::Vector2i> findShortestPath(Node* startNode, Node* targetNode, const int* obstacles);
+    void findPath(Cell* start, Cell* goal, std::vector<Cell*>& grid);
+    std::vector<Cell*> getPath(Cell* start, Cell* goal);
 
 private:
-    enum Direction { Up, Down, Left, Right };
-    enum State { Alive,Dead };
-    sf::Sprite sprite;
-    sf::Vector2f position;
-    float speed;
-    Direction direction;
-    State state;
-    float health;
-    float damage;
+    void addNeighbors(Cell* current, Cell* goal, std::priority_queue<Cell*, std::vector<Cell*>, CompareCells>& openList, std::vector<Cell*>&);
 };
 

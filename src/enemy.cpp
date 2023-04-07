@@ -1,121 +1,111 @@
 #include "enemy.h"
 
-Enemy::Enemy(sf::Texture& texture, sf::Vector2f position, float speed)
-{
-    // Set the texture and initial position of the enemy
-    sprite.setTexture(texture);
-    sprite.setPosition(position);
-    sprite.setTextureRect(sf::IntRect(0, 0, 31, 31));
-
-    this->position = position;
-    this->direction = Direction::Up;
-    this->speed = speed;
-    this->state = State::Alive;
-    this->health = 10;
-    this->damage = 10;
+Cell::Cell() {
+    x = 0;
+    y = 0;
+    gCost = INF;
+    hCost = INF;
+    fCost = INF;
+    obstacle = false;
+    visited = false;
+    parent = nullptr;
 }
 
-void Enemy::update(sf::Time deltaTime, const int* level, int playerX, int playerY) {
-    // Move the enemy towards the player
-    std::vector<sf::Vector2i> path = findShortestPath(new Node(this->position.x, this->position.y, false), new Node(playerX, playerY, false), level);
-    if (!path.empty()) {
-        // The first element in the path is the enemy's next target position
-        sf::Vector2i nextPosition = path[0];
+Cell::Cell(int x, int y, bool obstacle) {
+    this->x = x;
+    this->y = y;
+    gCost = INF;
+    hCost = INF;
+    fCost = INF;
+    this->obstacle = obstacle;
+    visited = false;
+    parent = nullptr;
+}
 
-        // Calculate the direction of movement
-        sf::Vector2i direction = nextPosition - sf::Vector2i(this->position);
-        if (direction.x != 0) {
-            direction.x /= std::abs(direction.x);
+int Cell::getDistance(Cell* other) {
+    int dx = abs(x - other->x);
+    int dy = abs(y - other->y);
+    return (dx + dy);
+}
+
+Enemy::Enemy(sf::Vector2f position, sf::Color color) {
+    shape.setSize(sf::Vector2f(CELL_SIZE, CELL_SIZE));
+    shape.setPosition(position);
+    shape.setFillColor(color);
+    pathIndex = 0;
+    isActive = true;
+}
+
+void Enemy::update() {
+    if (isActive && pathIndex < path.size()) {
+        Cell* nextCell = path[pathIndex];
+        sf::Vector2f nextPosition = sf::Vector2f(nextCell->x * CELL_SIZE, nextCell->y * CELL_SIZE);
+        if (shape.getPosition() == nextPosition) {
+            pathIndex++;
         }
-        if (direction.y != 0) {
-            direction.y /= std::abs(direction.y);
+        else {
+            sf::Vector2f direction = nextPosition - shape.getPosition();
+            float distance = std::sqrt(std::pow(direction.x, 2) + std::pow(direction.y, 2));
+            if (distance > 0.0f) {
+                direction /= distance;
+                shape.move(direction * 2.0f);
+            }
         }
-
-        // Calculate the new position
-        sf::Vector2f position = this->position;
-        position.x += speed * direction.x * deltaTime.asSeconds();
-        position.y += speed * direction.y * deltaTime.asSeconds();
-
-        // Update the enemy's position
-        this->position = position;
     }
 }
 
 void Enemy::draw(sf::RenderWindow& window) {
-    window.draw(sprite);
+    window.draw(shape);
 }
 
-std::vector<sf::Vector2i> Enemy::findShortestPath(Node* startNode, Node* targetNode, const int* obstacles) {
-    // create a 2D array of nodes to represent the game board
-    Node* board[16][16];
-    for (int i = 0; i < 16; i++) {
-        for (int j = 0; j < 16; j++) {
-            bool isObstacle = obstacles[i * 16 + j] == 60; // check if this tile is an obstacle
-            board[i][j] = new Node(i, j, isObstacle); // create a new node for this tile
+void Enemy::findPath(Cell* start, Cell* goal, std::vector<Cell*>& grid) {
+    path.clear();
+    pathIndex = 0;
+
+    std::priority_queue<Cell*, std::vector<Cell*>, CompareCells> openList;
+    std::vector<Cell*> closedList;
+
+    start->gCost = 0;
+    start->hCost = start->getDistance(goal);
+    start->fCost = start->hCost;
+    openList.push(start);
+
+    while (!openList.empty()) {
+        Cell* current = openList.top();
+        openList.pop();
+        if (current == goal) {
+            path = getPath(start, goal);
+            return;
         }
+        current->visited = true;
+        closedList.push_back(current);
+        addNeighbors(current, goal, openList, grid);
     }
+}
 
-    // initialize the start node
-    startNode->distanceFromStart = 0;
-    startNode->visited = true;
+std::vector<Cell*> Enemy::getPath(Cell* start, Cell* goal) {
+    std::vector<Cell*> path;
+    Cell* current = goal;
+    while (current != start) {
+        path.insert(path.begin(), current);
+        current = current->parent;
+    }
+    path.insert(path.begin(), start);
+    return path;
+}
 
-    // create a queue of nodes to visit in the pathfinding algorithm
-    std::queue<Node*> nodeQueue;
-    nodeQueue.push(startNode);
-
-    // continue pathfinding until we reach the target node
-    while (!nodeQueue.empty()) {
-        Node* currentNode = nodeQueue.front();
-        nodeQueue.pop();
-
-        // check if we've reached the target node
-        if (currentNode == targetNode) {
-            break;
-        }
-
-        // check each neighbor of the current node
-        std::vector<Node*> neighbors;
-        if (currentNode->x > 0) {
-            neighbors.push_back(board[currentNode->x - 1][currentNode->y]);
-        }
-        if (currentNode->x < 15) {
-            neighbors.push_back(board[currentNode->x + 1][currentNode->y]);
-        }
-        if (currentNode->y > 0) {
-            neighbors.push_back(board[currentNode->x][currentNode->y - 1]);
-        }
-        if (currentNode->y < 15) {
-            neighbors.push_back(board[currentNode->x][currentNode->y + 1]);
-        }
-
-        // update the distance and parent node of each neighbor
-        for (Node* neighbor : neighbors) {
-            if (!neighbor->visited && !neighbor->isObstacle) {
-                neighbor->visited = true;
-                neighbor->parent = currentNode;
-                neighbor->distanceFromStart = currentNode->distanceFromStart + 1;
-                nodeQueue.push(neighbor);
+void addNeighbors(Cell* current, Cell* goal, std::priority_queue<Cell*, std::vector<Cell*>, CompareCells>& openList, std::vector<Cell*>& visited) {
+    std::vector<Cell*> neighbors = getNeighbors(current);
+    for (Cell* neighbor : neighbors) {
+        if (std::find(visited.begin(), visited.end(), neighbor) == visited.end() && !neighbor->isBlocked) {
+            float newG = current->gCost + std::sqrt(std::pow(neighbor->x - current->x, 2) + std::pow(neighbor->y - current->y, 2));
+            if (newG < neighbor->gCost) {
+                neighbor->gCost = newG;
+                neighbor->hCost = std::sqrt(std::pow(goal->x - neighbor->x, 2) + std::pow(goal->y - neighbor->y, 2));
+                neighbor->fCost = neighbor->g + neighbor->hCost;
+                neighbor->parent = current;
+                openList.push(neighbor);
             }
         }
     }
-
-    std::vector<sf::Vector2i> path;
-    path.push_back(sf::Vector2i(targetNode->x, targetNode->y));
-    while (targetNode->parent) {
-        path.push_back(sf::Vector2i(targetNode->parent->x, targetNode->parent->y));
-        targetNode = targetNode->parent;
-    }
-
-    return path;
-
-    // once we've found the shortest path, you can navigate your enemy along it using the `parent` property of each node
 }
-
-Node::Node(int x, int y, bool isObstacle) :
-    x(x),
-    y(y),
-    isObstacle(isObstacle),
-    distanceFromStart(INT_MAX),
-    visited(false),
-    parent(nullptr)
-{}

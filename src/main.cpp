@@ -3,7 +3,6 @@
 int main() {
     sf::RenderWindow window(sf::VideoMode(512, 512), "Metal-Menace", sf::Style::Close | sf::Style::Titlebar);
     window.setFramerateLimit(60);
-    sf::Time elapsedTime;
     sf::Clock clock;
     bool isShooting = false;
 
@@ -16,13 +15,6 @@ int main() {
     player.setTexture(texture);
     player.setTextureRect(sf::IntRect(0, 0, 31, 31));
     player.setPosition(0, 0);
-
-    // enemy
-    sf::Image image_e;
-    image_e.loadFromFile("images/robot2.png");
-    sf::Texture texture_e;
-    texture_e.loadFromImage(image_e);
-    Enemy enemy1(texture_e, sf::Vector2f(32, 32), 10.0);
 
     // карта
     const int level[] = {
@@ -118,13 +110,9 @@ int main() {
             player.setTextureRect(sf::IntRect(0, 0, 31, 31));
         }
 
-        sf::Time deltaTime = clock.restart();
-        elapsedTime += deltaTime;
         window.clear(sf::Color::Black);
         window.draw(map);
         window.draw(player);
-        enemy1.update(deltaTime, level, 600, 600);
-        enemy1.draw(window);
         window.display();
     }
 
