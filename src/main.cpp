@@ -4,7 +4,7 @@ int main() {
     sf::RenderWindow window(sf::VideoMode(512, 512), "Metal-Menace", sf::Style::Close | sf::Style::Titlebar);
     window.setFramerateLimit(60);
     sf::Clock clock;
-    bool isShooting = false;
+    std::vector<Bullet> bullets;
 
     // персонаж
     sf::Image image;
@@ -15,6 +15,15 @@ int main() {
     player.setTexture(texture);
     player.setTextureRect(sf::IntRect(0, 0, 31, 31));
     player.setPosition(0, 0);
+
+    // пуля
+    sf::Image image_b;
+    image_b.loadFromFile("images/character.png");
+    sf::Texture texture_b;
+    texture_b.loadFromImage(image_b);
+    sf::Sprite bullet;
+    bullet.setTexture(texture_b);
+    bullet.setTextureRect(sf::IntRect(0, 0, 31, 31));
 
     // карта
     const int level[] = {
@@ -41,6 +50,7 @@ int main() {
         return -1;
 
     bool isMoving = false;
+    bool isShooting = false;
     char dir = 'n';
     float delay;
     float move = 0;
@@ -87,6 +97,11 @@ int main() {
             isMoving = true;
             dir = 'd';
         }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
+            Bullet bullet(player.getPosition(), dir);
+            bullets.push_back(bullet);
+            isShooting = true;
+        }
 
         if (isMoving && dir == 'n' && delay/1000 > 0.5) isMoving = false;
 
@@ -110,9 +125,18 @@ int main() {
             player.setTextureRect(sf::IntRect(0, 0, 31, 31));
         }
 
+        if (isShooting && delay / 1000 < 0.5)
+        {
+            for (auto& elem : bullets)
+                bullet.setPosition(elem.update(0.025 * time));
+        }
+
         window.clear(sf::Color::Black);
         window.draw(map);
         window.draw(player);
+        for (auto& elem : bullets) { 
+            window.draw(bullet);
+        }
         window.display();
     }
 

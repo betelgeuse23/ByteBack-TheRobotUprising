@@ -1,6 +1,6 @@
 #include "enemy.h"
 
-Cell::Cell() {
+/*Cell::Cell() {
     x = 0;
     y = 0;
     gCost = INF;
@@ -108,4 +108,4 @@ void addNeighbors(Cell* current, Cell* goal, std::priority_queue<Cell*, std::vec
             }
         }
     }
-}
+}*/

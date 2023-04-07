@@ -2,33 +2,13 @@
 
 class Bullet {
 public:
-    Bullet(sf::Texture& texture, sf::Vector2f position, float speed, float damage, float range);
-    void update(sf::Time deltaTime);
-    bool isAlive();
-    void draw(sf::RenderWindow& window);
-private:
-    sf::Sprite m_sprite;
-    sf::Vector2f m_velocity;
-    float m_speed;
-    float m_damage;
-    float m_range;
-    float m_distanceTravelled;
-};
-
-class Shooter {
-public:
-    Shooter(sf::Texture& texture, sf::Vector2f position, float speed, float fireRate);
-    void update(sf::Time deltaTime);
-
+    Bullet(sf::Vector2f pos, char dir);
+    sf::Vector2f update(float dt);
+    //bool checkCollisionsWithEnemy(std::vector<Enemy>& enemies);
+    //bool checkCollisionsWithObstacle(std::vector<Obstacle>& obstacles);
 
 private:
-    sf::Sprite sprite;
+    sf::Vector2f position;
     sf::Vector2f velocity;
-    float speed;
-    float fireRate;
-    float timeSinceLastShot;
-    std::vector<Bullet> bullets;
-
-    void shoot();
-    void updateProjectiles(sf::Time deltaTime);
+    char direction;
 };
