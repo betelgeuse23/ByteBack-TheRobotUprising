@@ -17,9 +17,9 @@ class Enemy {
 public:
     Enemy(sf::Texture& texture, sf::Vector2f position, float speed);
 
-    void update(sf::Time deltaTime, const std::vector<int> level, int playerX, int playerY);
+    void update(sf::Time deltaTime, const int* level, int playerX, int playerY);
     void draw(sf::RenderWindow& window);
-    std::vector<sf::Vector2i> findShortestPath(Node* startNode, Node* targetNode, const std::vector<int> obstacles);
+    std::vector<sf::Vector2i> findShortestPath(Node* startNode, Node* targetNode, const int* obstacles);
 
 private:
     enum Direction { Up, Down, Left, Right };

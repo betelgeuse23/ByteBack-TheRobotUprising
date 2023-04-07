@@ -15,7 +15,7 @@ Enemy::Enemy(sf::Texture& texture, sf::Vector2f position, float speed)
     this->damage = 10;
 }
 
-void Enemy::update(sf::Time deltaTime, const std::vector<int> level, int playerX, int playerY) {
+void Enemy::update(sf::Time deltaTime, const int* level, int playerX, int playerY) {
     // Move the enemy towards the player
     std::vector<sf::Vector2i> path = findShortestPath(new Node(this->position.x, this->position.y, false), new Node(playerX, playerY, false), level);
     if (!path.empty()) {
@@ -45,12 +45,12 @@ void Enemy::draw(sf::RenderWindow& window) {
     window.draw(sprite);
 }
 
-std::vector<sf::Vector2i> Enemy::findShortestPath(Node* startNode, Node* targetNode, const std::vector<int> obstacles) {
+std::vector<sf::Vector2i> Enemy::findShortestPath(Node* startNode, Node* targetNode, const int* obstacles) {
     // create a 2D array of nodes to represent the game board
     Node* board[16][16];
     for (int i = 0; i < 16; i++) {
         for (int j = 0; j < 16; j++) {
-            bool isObstacle = obstacles[i * 16 + j] == 1; // check if this tile is an obstacle
+            bool isObstacle = obstacles[i * 16 + j] == 60; // check if this tile is an obstacle
             board[i][j] = new Node(i, j, isObstacle); // create a new node for this tile
         }
     }
