@@ -26,6 +26,8 @@ public:
     void animate(int ch, int sec);
     void move(Direction dir);
     void move();
+    sf::Vector2f pos() { return position; };
+    void info();
 private:
     sf::Clock clock;
     sf::Sprite sprite;
@@ -33,9 +35,9 @@ private:
     sf::Vector2f position;
     Direction direction = None;
     State state = Still;
-    float health = 0;
-    float damage = 0;
     float speed = 0.1;
 };
 
-//Direction pathfind(const int* level, sf::Vector2f size, sf::Vector2f pos, sf::Vector2f dest);
+Direction pathfind(const int* level, sf::Vector2f size, sf::Vector2f pos, sf::Vector2f dest);
+
+sf::Vector2f gPos(sf::Vector2f pos); 
