@@ -48,12 +48,15 @@ int main() {
     bool isShooting = false;
     float bulDelay = 0;
 
+    Entity ent("images/robot2.png", sf::Vector2f(32, 32));
+
+
     // работа с окном
     while (window.isOpen())
+    while (window.isOpen())
     {
-        float time = clock.getElapsedTime().asMicroseconds();
+        float time = clock.getElapsedTime().asMilliseconds();
         clock.restart();
-        time = time / 300;
 
         if (!(isMoving)) delay = 0;
         else delay += time;
@@ -76,21 +79,25 @@ int main() {
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) && !(isMoving)) {
             isMoving = true;
             dir = 'l';
+            ent.move(Left);
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) && !(isMoving)) {
             isMoving = true;
             dir = 'r';
+            ent.move(Right);
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && !(isMoving)) {
             isMoving = true;
             dir = 'u';
+            ent.move(Up);
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && !(isMoving)) {
             isMoving = true;
             dir = 'd';
+            ent.move(Down);
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
-            if (bulDelay > 2000)
+            if (bulDelay > 300)
             {
                 isShooting = true;
                 Bullet bullet(player.getPosition(), dir, "images/robot1.png");
@@ -99,21 +106,21 @@ int main() {
             else isShooting = false;
         }
 
-        if (isMoving && dir == 'n' && delay/1000 > 0.5) isMoving = false;
+        if (isMoving && dir == 'n' && delay/1000 > 0.1) isMoving = false;
 
         if (isMoving && move < 32 && dir != 'n') {
-            move += 0.1 * time;
+            move += 0.2 * time;
             float k = move > 32 ? move - 32 : 0;
             if (dir == 'u') {
-                player.move(0, -0.1 * time + k);
+                player.move(0, -0.2 * time + k);
             } else if (dir == 'd') {
-                player.move(0, 0.1 * time - k);
+                player.move(0, 0.2 * time - k);
             } else if (dir == 'r') {
-                player.move(0.1 * time - k, 0);
+                player.move(0.2 * time - k, 0);
             } else if (dir == 'l') {
-                player.move(-0.1 * time + k, 0);
+                player.move(-0.2 * time + k, 0);
             }
-            player.setTextureRect(sf::IntRect(32 * (int(move/8) % 4), 0, 31, 31));
+            player.setTextureRect(sf::IntRect(32 * (int(move/16) % 2), 0, 31, 31));
         }
         else {
             move = 0;
@@ -121,12 +128,15 @@ int main() {
             player.setTextureRect(sf::IntRect(0, 0, 31, 31));
         }
 
+        
         window.clear(sf::Color::Black);
         window.draw(map);
         for (auto& elem : bullets) { 
-            elem.getSprite().setPosition(elem.update(0.025 * time));
+            elem.getSprite().setPosition(elem.update(0.09 * time));
             window.draw(elem.getSprite());
         }
+        ent.move();
+        ent.draw(window);
         window.draw(player);
         window.display();
     }
