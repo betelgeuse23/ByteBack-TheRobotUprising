@@ -1,8 +1,8 @@
 #include "bullet.h"
 
-Bullet::Bullet(sf::Vector2f pos, char dir, char* img) {
+Bullet::Bullet(sf::Vector2f pos, char dir, std::string img) {
 	position = pos;
-	if (dir == 'd') velocity = sf::Vector2f(0, 5.0);
+	if (dir == 'd' || dir == 'n') velocity = sf::Vector2f(0, 5.0);
 	else if (dir == 'u') velocity = sf::Vector2f(0, -5.0);
 	else if (dir == 'r') velocity = sf::Vector2f(5.0, 0);
 	else if (dir == 'l') velocity = sf::Vector2f(-5.0, 0);

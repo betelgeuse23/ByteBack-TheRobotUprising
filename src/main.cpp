@@ -93,7 +93,7 @@ int main() {
             if (bulDelay > 2000)
             {
                 isShooting = true;
-                Bullet bullet(player.getPosition(), dir, "images/character.png");
+                Bullet bullet(player.getPosition(), dir, "images/robot1.png");
                 bullets.push_back(bullet);
             }
             else isShooting = false;
@@ -123,11 +123,11 @@ int main() {
 
         window.clear(sf::Color::Black);
         window.draw(map);
-        window.draw(player);
         for (auto& elem : bullets) { 
             elem.getSprite().setPosition(elem.update(0.025 * time));
             window.draw(elem.getSprite());
         }
+        window.draw(player);
         window.display();
     }
 

@@ -1,8 +1,11 @@
+#pragma once
+
 #include <SFML/Graphics.hpp>
+#include <string>
 
 class Bullet {
 public:
-    Bullet(sf::Vector2f pos, char dir, char* img);
+    Bullet(sf::Vector2f pos, char dir, std::string img);
     sf::Vector2f update(float dt);
     sf::Sprite& getSprite();
     //bool checkCollisionsWithEnemy(std::vector<Enemy>& enemies);
