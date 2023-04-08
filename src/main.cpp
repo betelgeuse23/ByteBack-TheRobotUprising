@@ -1,7 +1,7 @@
 ﻿#include "main.h"
 
 int main() {
-    sf::RenderWindow window(sf::VideoMode(512, 512), "Metal-Menace", sf::Style::Close | sf::Style::Titlebar);
+    sf::RenderWindow window(sf::VideoMode((WIDTH + 8) * 32, WIDTH * 32), "Metal-Menace", sf::Style::Close | sf::Style::Titlebar);
     window.setFramerateLimit(60);
     sf::Clock clock;
     std::vector<Bullet> bullets;
@@ -20,28 +20,47 @@ int main() {
     bulletSprite.setTexture(bulletTexture);
     bulletSprite.setTextureRect(sf::IntRect(0, 0, 31, 31));
 
+    // текст
+    sf::Font font;
+    font.loadFromFile("fonts/pixel.ttf");
+
+    sf::Text healthText("Health", font, 32);
+    healthText.setLetterSpacing(2);
+    healthText.setFillColor(sf::Color::White);
+    healthText.setPosition(680, 10);
+
+    sf::Text enemiesText("Enemies", font, 32);
+    enemiesText.setLetterSpacing(2);
+    enemiesText.setFillColor(sf::Color::White);
+    enemiesText.setPosition(680, 200);
+
     // карта
     int level[] = {
-        0, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 4, 4, 4, 4, 4, 4, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 6, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     };
 
     TileMap map;
-    if (!map.load("images/tileset.png", sf::Vector2u(32, 32), level, 16, 16))
+    if (!map.load("images/tileset.png", sf::Vector2u(32, 32), level, WIDTH, WIDTH))
         return -1;
 
     bool isMoving = false;
@@ -100,7 +119,7 @@ int main() {
             ent.move(Down);
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
-            if (bulDelay > 300)
+            if (bulDelay > 800)
             {
                 isShooting = true;
                 Bullet bullet(player.getPosition(), dir);
@@ -133,6 +152,9 @@ int main() {
         
         window.clear(sf::Color::Black);
         window.draw(map);
+        window.draw(healthText);
+        window.draw(enemiesText);
+
         for (auto& bullet : bullets) {
             bullet.update(0.09 * time);
             //if (bullet.checkCollisionsWithEnemy(enemies)) {
@@ -141,13 +163,13 @@ int main() {
             //}
             if (bullet.checkCollisionsWithObstacle(level)) {
                 bullets.erase(std::remove(bullets.begin(), bullets.end(), bullet), bullets.end());
-                if (!map.load("images/tileset.png", sf::Vector2u(32, 32), level, 16, 16))
+                if (!map.load("images/tileset.png", sf::Vector2u(32, 32), level, WIDTH, WIDTH))
                     return -1;
             }
             else if (bullet.getPosition().y < 0 && bullet.getDirection() == 'u' || 
-                bullet.getPosition().y > 600 && (bullet.getDirection() == 'd' || bullet.getDirection() == 'n') ||
+                bullet.getPosition().y > 672 && (bullet.getDirection() == 'd' || bullet.getDirection() == 'n') ||
                 bullet.getPosition().x < 0 && bullet.getDirection() == 'l' ||
-                bullet.getPosition().x > 600 && bullet.getDirection() == 'r') {
+                bullet.getPosition().x > 672 && bullet.getDirection() == 'r') {
                 std::cout << 'a';
                 bullets.erase(std::remove(bullets.begin(), bullets.end(), bullet), bullets.end());
             }
@@ -156,8 +178,6 @@ int main() {
                 window.draw(bulletSprite);
             }
         }
-        /*ent.move();
-        ent.draw(window);*/
         window.draw(player);
         window.display();
     }

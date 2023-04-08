@@ -27,7 +27,7 @@ char Bullet::getDirection() {
 //}
 
 bool Bullet::checkCollisionsWithObstacle(int* obstacles) {
-	int tile = int(position.x / 32 + 0.5) + int(position.y / 32 + 0.5) * 16;
+	int tile = int(position.x / 32 + 0.5) + int(position.y / 32 + 0.5) * 21;
 	if (obstacles[tile] == 5) return true;
 	else if (obstacles[tile] == 2) {
 		obstacles[tile] = 1;
