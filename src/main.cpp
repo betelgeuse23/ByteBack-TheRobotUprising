@@ -71,7 +71,6 @@ int main() {
     bool isShooting = false;
     float bulDelay = 0;
 
-    Entity ent("images/robot2.png", sf::Vector2f(32, 32));
 
 
     // работа с окном
@@ -101,22 +100,18 @@ int main() {
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) && !(isMoving)) {
             isMoving = true;
             dir = 'l';
-            ent.move(Left);
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) && !(isMoving)) {
             isMoving = true;
             dir = 'r';
-            ent.move(Right);
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && !(isMoving)) {
             isMoving = true;
             dir = 'u';
-            ent.move(Up);
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && !(isMoving)) {
             isMoving = true;
             dir = 'd';
-            ent.move(Down);
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
             if (bulDelay > 800)
