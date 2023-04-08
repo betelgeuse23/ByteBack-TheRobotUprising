@@ -10,7 +10,7 @@ public:
     sf::Vector2f Bullet::getPosition();
     char Bullet::getDirection();
     //bool checkCollisionsWithEnemy(std::vector<Enemy>& enemies);
-    bool checkCollisionsWithObstacle(const int* obstacles);
+    bool checkCollisionsWithObstacle(int* obstacles);
 
     inline bool operator==(const Bullet& c) {
         if (position == c.position && direction == c.direction)

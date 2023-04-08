@@ -7,27 +7,27 @@ int main() {
     std::vector<Bullet> bullets;
 
     // текстуры
-    sf::Texture characterTtexture;
-    characterTtexture.loadFromFile("images/character.png");
+    sf::Texture characterTexture;
+    characterTexture.loadFromFile("images/character.png");
     sf::Sprite player;
-    player.setTexture(characterTtexture);
+    player.setTexture(characterTexture);
     player.setTextureRect(sf::IntRect(0, 0, 31, 31));
     player.setPosition(0, 0);
 
     sf::Texture bulletTexture;
-    bulletTexture.loadFromFile("images/robot1.png");
+    bulletTexture.loadFromFile("images/bullet.png");
     sf::Sprite bulletSprite;
-    bulletSprite.setTexture(characterTtexture);
+    bulletSprite.setTexture(bulletTexture);
     bulletSprite.setTextureRect(sf::IntRect(0, 0, 31, 31));
 
     // карта
-    const int level[] = {
+    int level[] = {
         0, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 4, 4, 4, 4, 4, 4, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -141,6 +141,8 @@ int main() {
             //}
             if (bullet.checkCollisionsWithObstacle(level)) {
                 bullets.erase(std::remove(bullets.begin(), bullets.end(), bullet), bullets.end());
+                if (!map.load("images/tileset.png", sf::Vector2u(32, 32), level, 16, 16))
+                    return -1;
             }
             else if (bullet.getPosition().y < 0 && bullet.getDirection() == 'u' || 
                 bullet.getPosition().y > 600 && (bullet.getDirection() == 'd' || bullet.getDirection() == 'n') ||

@@ -26,7 +26,16 @@ char Bullet::getDirection() {
 //
 //}
 
-bool Bullet::checkCollisionsWithObstacle(const int* obstacles) {
-	if (obstacles[int(position.x / 32 + 0.5) + int(position.y / 32 + 0.5) * 16] == 4) return true;
+bool Bullet::checkCollisionsWithObstacle(int* obstacles) {
+	int tile = int(position.x / 32 + 0.5) + int(position.y / 32 + 0.5) * 16;
+	if (obstacles[tile] == 5) return true;
+	else if (obstacles[tile] == 2) {
+		obstacles[tile] = 1;
+		return true;
+	}
+	else if (obstacles[tile] == 1) {
+		obstacles[tile] = 0;
+		return true;
+	}
 	return false;
 }
