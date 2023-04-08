@@ -10,7 +10,7 @@ file(GLOB_RECURSE IMAGES_FILES ${CMAKE_SOURCE_DIR}/images/*)
 FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/images" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${HEADER_FILES})
-set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
+#set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
 
 find_package(SFML REQUIRED graphics window)
 target_link_libraries(${PROJECT_NAME} sfml-graphics sfml-window)
