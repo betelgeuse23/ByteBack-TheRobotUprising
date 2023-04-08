@@ -22,7 +22,7 @@ int main() {
 
     // карта
     const int level[] = {
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -133,9 +133,26 @@ int main() {
         
         window.clear(sf::Color::Black);
         window.draw(map);
-        for (auto& elem : bullets) { 
-            bulletSprite.setPosition(elem.update(0.09 * time));
-            window.draw(bulletSprite);
+        for (auto& bullet : bullets) {
+            bullet.update(0.09 * time);
+            //if (bullet.checkCollisionsWithEnemy(enemies)) {
+            //    // bullet hit an enemy, remove both bullet and enemy
+            //    bullets.erase(std::remove(bullets.begin(), bullets.end(), bullet), bullets.end());
+            //}
+            if (bullet.checkCollisionsWithObstacle(level)) {
+                bullets.erase(std::remove(bullets.begin(), bullets.end(), bullet), bullets.end());
+            }
+            else if (bullet.getPosition().y < 0 && bullet.getDirection() == 'u' || 
+                bullet.getPosition().y > 600 && (bullet.getDirection() == 'd' || bullet.getDirection() == 'n') ||
+                bullet.getPosition().x < 0 && bullet.getDirection() == 'l' ||
+                bullet.getPosition().x > 600 && bullet.getDirection() == 'r') {
+                std::cout << 'a';
+                bullets.erase(std::remove(bullets.begin(), bullets.end(), bullet), bullets.end());
+            }
+            else {
+                bulletSprite.setPosition(bullet.getPosition());
+                window.draw(bulletSprite);
+            }
         }
         /*ent.move();
         ent.draw(window);*/

@@ -13,3 +13,20 @@ sf::Vector2f Bullet::update(float dt) {
 	position += velocity * dt;
 	return position;
 }
+
+sf::Vector2f Bullet::getPosition() {
+	return position;
+}
+
+char Bullet::getDirection() {
+	return direction;
+}
+
+//bool checkCollisionsWithEnemy(std::vector<Enemy>& enemies) {
+//
+//}
+
+bool Bullet::checkCollisionsWithObstacle(const int* obstacles) {
+	if (obstacles[int(position.x / 32 + 0.5) + int(position.y / 32 + 0.5) * 16] == 4) return true;
+	return false;
+}
