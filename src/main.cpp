@@ -6,15 +6,19 @@ int main() {
     sf::Clock clock;
     std::vector<Bullet> bullets;
 
-    // персонаж
-    sf::Image image;
-    image.loadFromFile("images/character.png");
-    sf::Texture texture;
-    texture.loadFromImage(image);
+    // текстуры
+    sf::Texture characterTtexture;
+    characterTtexture.loadFromFile("images/character.png");
     sf::Sprite player;
-    player.setTexture(texture);
+    player.setTexture(characterTtexture);
     player.setTextureRect(sf::IntRect(0, 0, 31, 31));
     player.setPosition(0, 0);
+
+    sf::Texture bulletTexture;
+    bulletTexture.loadFromFile("images/robot1.png");
+    sf::Sprite bulletSprite;
+    bulletSprite.setTexture(characterTtexture);
+    bulletSprite.setTextureRect(sf::IntRect(0, 0, 31, 31));
 
     // карта
     const int level[] = {
@@ -25,7 +29,7 @@ int main() {
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 4, 4, 4, 4, 4, 4, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -52,7 +56,6 @@ int main() {
 
 
     // работа с окном
-    while (window.isOpen())
     while (window.isOpen())
     {
         float time = clock.getElapsedTime().asMilliseconds();
@@ -100,7 +103,7 @@ int main() {
             if (bulDelay > 300)
             {
                 isShooting = true;
-                Bullet bullet(player.getPosition(), dir, "images/robot1.png");
+                Bullet bullet(player.getPosition(), dir);
                 bullets.push_back(bullet);
             }
             else isShooting = false;
@@ -127,16 +130,15 @@ int main() {
             dir = 'n';
             player.setTextureRect(sf::IntRect(0, 0, 31, 31));
         }
-
         
         window.clear(sf::Color::Black);
         window.draw(map);
         for (auto& elem : bullets) { 
-            elem.getSprite().setPosition(elem.update(0.09 * time));
-            window.draw(elem.getSprite());
+            bulletSprite.setPosition(elem.update(0.09 * time));
+            window.draw(bulletSprite);
         }
-        ent.move();
-        ent.draw(window);
+        /*ent.move();
+        ent.draw(window);*/
         window.draw(player);
         window.display();
     }
