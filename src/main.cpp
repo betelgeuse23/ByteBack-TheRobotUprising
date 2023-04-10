@@ -1,7 +1,11 @@
 ﻿#include "main.h"
 
+void Options();
+void Tutorial();
+
 void startGame(sf::RenderWindow &window, sf::Clock &clock) {
     std::vector<Bullet> bullets;
+    std::vector<Enemy> enemies;
 
     // текстуры
     sf::Texture characterTexture;
@@ -151,10 +155,9 @@ void startGame(sf::RenderWindow &window, sf::Clock &clock) {
 
         for (auto& bullet : bullets) {
             bullet.update(0.09 * time);
-            //if (bullet.checkCollisionsWithEnemy(enemies)) {
-            //    // bullet hit an enemy, remove both bullet and enemy
-            //    bullets.erase(std::remove(bullets.begin(), bullets.end(), bullet), bullets.end());
-            //}
+            if (bullet.checkCollisionsWithEnemy(enemies)) {
+                bullets.erase(std::remove(bullets.begin(), bullets.end(), bullet), bullets.end());
+            }
             if (bullet.checkCollisionsWithObstacle(level)) {
                 bullets.erase(std::remove(bullets.begin(), bullets.end(), bullet), bullets.end());
                 map.load("images/tileset.png", sf::Vector2u(32, 32), level, WIDTH, WIDTH);
@@ -205,7 +208,7 @@ int main() {
     point.setFillColor(sf::Color::White);
 
 
-    sf::String name_menu[]{ L"START", L"CONTINUE", L"SETTINGS", L"ABOUT", L"EXIT" };
+    sf::String name_menu[]{ L"START", L"CONTINUE", L"OPTIONS", L"TUTORIAL", L"QUIT" };
     Menu menu(window, name_menu);
 
     while (window.isOpen()) {
@@ -236,8 +239,9 @@ int main() {
                 switch (menu.getSelectedMenuNumber())
                 {
                 case 0:startGame(window, clock);   break;
-                /*case 1:Options();     break;
-                case 2:About_Game();  break;*/
+                case 2:Options();  break;
+                case 3:Tutorial(); break;
+                //case 2:About_Game();  break;
                 case 4:window.close(); break;
 
                 }
@@ -253,4 +257,60 @@ int main() {
         window.display();
     }
     return 0;
+}
+
+void Options() {
+    sf::RenderWindow window(sf::VideoMode((WIDTH + 6) * 32, WIDTH * 32), "Byte Back: The Robot Uprising", sf::Style::Close | sf::Style::Titlebar);
+    window.setFramerateLimit(60);
+    window.setMouseCursorVisible(false);
+    sf::Clock clock;
+    float delay = 0;
+
+    TileMap menuMap;
+    int map[729] = { 0 };
+    menuMap.load("images/tileset.png", sf::Vector2u(32, 32), map, WIDTH + 6, WIDTH);
+
+    while (window.isOpen())
+    {
+        sf::Event event;
+        while (window.pollEvent(event))
+        {
+            if (event.type == sf::Event::Closed) window.close();
+            if (event.type == sf::Event::KeyPressed)
+            {
+                if (event.key.code == sf::Keyboard::Escape) window.close();
+            }
+        }
+        window.clear();
+        window.draw(menuMap);
+        window.display();
+    }
+}
+
+void Tutorial() {
+    sf::RenderWindow window(sf::VideoMode((WIDTH + 6) * 32, WIDTH * 32), "Byte Back: The Robot Uprising", sf::Style::Close | sf::Style::Titlebar);
+    window.setFramerateLimit(60);
+    window.setMouseCursorVisible(false);
+    sf::Clock clock;
+    float delay = 0;
+
+    TileMap menuMap;
+    int map[729] = { 0 };
+    menuMap.load("images/tileset.png", sf::Vector2u(32, 32), map, WIDTH + 6, WIDTH);
+
+    while (window.isOpen())
+    {
+        sf::Event event;
+        while (window.pollEvent(event))
+        {
+            if (event.type == sf::Event::Closed) window.close();
+            if (event.type == sf::Event::KeyPressed)
+            {
+                if (event.key.code == sf::Keyboard::Escape) window.close();
+            }
+        }
+        window.clear();
+        window.draw(menuMap);
+        window.display();
+    }
 }

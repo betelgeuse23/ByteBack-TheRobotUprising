@@ -22,9 +22,14 @@ char Bullet::getDirection() {
 	return direction;
 }
 
-//bool checkCollisionsWithEnemy(std::vector<Enemy>& enemies) {
-//
-//}
+bool Bullet::checkCollisionsWithEnemy(std::vector<Enemy>& enemies) {
+	int tileEnemy = 0;
+	int tileBullet = int(position.x / 32 + 0.5) + int(position.y / 32 + 0.5) * 21;
+	for (auto& enemy : enemies) {
+		tileEnemy = int(position.x / 32 + 0.5) + int(position.y / 32 + 0.5) * 21;
+		if (tileBullet == tileEnemy) enemy.doDamage(10);
+	}
+}
 
 bool Bullet::checkCollisionsWithObstacle(int* obstacles) {
 	int tile = int(position.x / 32 + 0.5) + int(position.y / 32 + 0.5) * 21;

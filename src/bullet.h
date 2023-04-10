@@ -2,6 +2,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <cmath>
+#include "Entity.h"
 
 class Bullet {
 public:
@@ -9,7 +10,7 @@ public:
     sf::Vector2f update(float dt);
     sf::Vector2f Bullet::getPosition();
     char Bullet::getDirection();
-    //bool checkCollisionsWithEnemy(std::vector<Enemy>& enemies);
+    bool checkCollisionsWithEnemy(std::vector<Enemy>& enemies);
     bool checkCollisionsWithObstacle(int* obstacles);
 
     inline bool operator==(const Bullet& c) {
