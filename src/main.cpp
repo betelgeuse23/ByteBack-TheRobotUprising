@@ -1,7 +1,7 @@
 ﻿#include "main.h"
 
 void startGame() {
-    sf::RenderWindow window(sf::VideoMode((WIDTH + 6) * 32, WIDTH * 32), "Metal-Menace", sf::Style::Close | sf::Style::Titlebar);
+    sf::RenderWindow window(sf::VideoMode((WIDTH + 6) * 32, WIDTH * 32), "Byte Back: The Robot Uprising", sf::Style::Close | sf::Style::Titlebar);
     window.setFramerateLimit(60);
     window.setMouseCursorVisible(false);
     sf::Clock clock;
@@ -13,7 +13,7 @@ void startGame() {
     sf::Sprite player;
     player.setTexture(characterTexture);
     player.setTextureRect(sf::IntRect(0, 0, 31, 31));
-    player.setPosition(0, 0);
+    player.setPosition(32, 32);
 
     sf::Texture bulletTexture;
     bulletTexture.loadFromFile("images/bullet.png");
@@ -26,12 +26,12 @@ void startGame() {
     font.loadFromFile("fonts/pixel.ttf");
 
     sf::Text healthText("Health", font, 32);
-    healthText.setLetterSpacing(2);
+    healthText.setLetterSpacing(1);
     healthText.setFillColor(sf::Color::White);
     healthText.setPosition(680, 10);
 
     sf::Text enemiesText("Enemies", font, 32);
-    enemiesText.setLetterSpacing(2);
+    enemiesText.setLetterSpacing(1);
     enemiesText.setFillColor(sf::Color::White);
     enemiesText.setPosition(680, 200);
 
@@ -181,9 +181,10 @@ void startGame() {
 }
 
 int main() {
-    sf::RenderWindow window(sf::VideoMode((WIDTH + 6) * 32, WIDTH * 32), "Metal-Menace", sf::Style::Close | sf::Style::Titlebar);
+    sf::RenderWindow window(sf::VideoMode((WIDTH + 6) * 32, WIDTH * 32), "Byte Back: The Robot Uprising", sf::Style::Close | sf::Style::Titlebar);
     window.setFramerateLimit(60);
     sf::Clock clock;
+    float delay = 0;
 
     TileMap menuMap;
     int map[729] = { 0 };
@@ -192,43 +193,67 @@ int main() {
     // текст
     sf::Font fontPixel;
     fontPixel.loadFromFile("fonts/pixel.ttf");
-
     sf::Font fontArial;
     fontArial.loadFromFile("fonts/arial.ttf");
 
-    sf::Text Titul("Metal Menace", fontPixel, 50);
-    Titul.setLetterSpacing(2);
-    Titul.setFillColor(sf::Color::White);
-    Titul.setPosition(10, 10);
+    sf::Text titulFirst("Byte Back:", fontPixel, 70);
+    titulFirst.setLetterSpacing(2);
+    titulFirst.setFillColor(sf::Color::White);
+    titulFirst.setPosition(20, 23);
+    sf::Text titulSecond("the robot uprising", fontArial, 30);
+    titulSecond.setLetterSpacing(2);
+    titulSecond.setFillColor(sf::Color::White);
+    titulSecond.setPosition(416, 96);
+    sf::Text point(">", fontPixel, 35);
+    point.setFillColor(sf::Color::White);
 
 
-    std::string name_menu[]{ "Start", "Continue", "Configure", "About", "Exit" };
-    /*game::GameMenu mymenu(window, 950, 350, 4, name_menu, 100, 120);
-    mymenu.setColorTextMenu(Color(237, 147, 0), Color::Red, Color::Black);
-    mymenu.AlignMenu(2);*/
+    sf::String name_menu[]{ L"START", L"CONTINUE", L"SETTINGS", L"ABOUT", L"EXIT" };
+    Menu menu(window, name_menu);
 
     while (window.isOpen())
     {
         sf::Event event;
+
+        float time = clock.getElapsedTime().asMilliseconds();
+        clock.restart();
+        delay += time;
+
         while (window.pollEvent(event))
         {
-            if (event.type == sf::Event::Closed) window.close();
-            /*if (event.key.code == sf::Keyboard::Up) { mymenu.MoveUp(); }
-            if (event.key.code == sf::Keyboard::Down) { mymenu.MoveDown(); }
+            if (event.type == sf::Event::Closed) { window.close(); }
+            if (event.key.code == sf::Keyboard::Up) { 
+                if (delay > 300)
+                {
+                    menu.MoveUp();
+                    delay = 0;
+                }
+            }
+            if (event.key.code == sf::Keyboard::Down) { 
+                if (delay > 300)
+                {
+                    menu.MoveDown();
+                    delay = 0;
+                }
+            }
             if (event.key.code == sf::Keyboard::Return)
             {
-                switch (mymenu.getSelectedMenuNumber())
+                switch (menu.getSelectedMenuNumber())
                 {
                 case 0:startGame();   break;
-                case 1:Options();     break;
-                case 2:About_Game();  break;
-                case 3:window.close(); break;
+                /*case 1:Options();     break;
+                case 2:About_Game();  break;*/
+                case 4:window.close(); break;
 
                 }
-            }*/
+            }
             window.clear(sf::Color::Black);
             window.draw(menuMap);
-            window.draw(Titul);
+            window.draw(titulFirst);
+            window.draw(titulSecond);
+            menu.draw();
+            point.setPosition(40, (menu.getSelectedMenuNumber() * 2 + 6) * 32);
+            window.draw(point);
         }
         window.display();
     }
