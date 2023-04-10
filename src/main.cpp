@@ -4,7 +4,10 @@ void Options();
 void Tutorial();
 void savingScreen();
 
-void startGame(sf::RenderWindow& window, sf::Clock& clock) {
+void startGame(sf::Clock& clock) {
+    sf::RenderWindow window(sf::VideoMode((WIDTH + 6) * 32, WIDTH * 32), "Byte Back: The Robot Uprising", sf::Style::Close | sf::Style::Titlebar);
+    window.setFramerateLimit(60);
+    window.setMouseCursorVisible(false);
 
     // текстуры
     sf::Texture bulletTexture;
@@ -12,6 +15,12 @@ void startGame(sf::RenderWindow& window, sf::Clock& clock) {
     sf::Sprite bulletSprite;
     bulletSprite.setTexture(bulletTexture);
     bulletSprite.setTextureRect(sf::IntRect(0, 0, 31, 31));
+
+    sf::Texture heartTexture;
+    heartTexture.loadFromFile("images/bonusesbig.png");
+    sf::Sprite heartSprite;
+    heartSprite.setTexture(heartTexture);
+    heartSprite.setTextureRect(sf::IntRect(0, 0, 95, 95));
 
     // текст
     sf::Font font;
@@ -21,11 +30,6 @@ void startGame(sf::RenderWindow& window, sf::Clock& clock) {
     healthText.setLetterSpacing(1);
     healthText.setFillColor(sf::Color::White);
     healthText.setPosition(680, 10);
-
-    sf::Text enemiesText("Enemies", font, 32);
-    enemiesText.setLetterSpacing(1);
-    enemiesText.setFillColor(sf::Color::White);
-    enemiesText.setPosition(680, 200);
 
     // карта
     int level[] = {
@@ -93,7 +97,10 @@ void startGame(sf::RenderWindow& window, sf::Clock& clock) {
             if (event.type == sf::Event::KeyPressed)
             {
                 // Закрываем окно
-                if (event.key.code == sf::Keyboard::Escape) window.close();
+                if (event.key.code == sf::Keyboard::Escape) {
+                    savingScreen();
+                    window.close();
+                }
             }
         }
 
@@ -119,23 +126,21 @@ void startGame(sf::RenderWindow& window, sf::Clock& clock) {
             else isShooting = false;
         }
 
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Equal)) {
-            if (del > 800) {
-                level1.enemies.push_back(new Enemy("images/robot2.png", sf::Vector2i(1, 1)));
-                level1.enemies.back()->initPatfind(&level1, { {0,1} });
-                del = 0;
-            }
-        }
-
         window.clear(sf::Color::Black);
         window.draw(map);
         window.draw(healthText);
-        window.draw(enemiesText);
 
         for (auto& e : level1.enemies) {
             if (e->getState() != Dead) {
                 e->update();
                 e->draw(window);
+                if (e->getPosition() == level1.base) {
+                    level1.player->doDamage();
+                    level1.player->doDamage();
+                    level1.player->doDamage();
+                    level1.player->doDamage();
+                    level1.player->doDamage();
+                }
             }
             else {
                 delete e;
@@ -157,6 +162,16 @@ void startGame(sf::RenderWindow& window, sf::Clock& clock) {
                 window.draw(bulletSprite);
             }
         }
+
+        for (int i = 0; i < level1.player->getLives(); i++)
+        {
+            heartSprite.setPosition(620 + (i + 1) * 32, 20);
+            window.draw(heartSprite);
+        }
+        if (level1.player->getLives() == 0 || level1.enemies.empty()) {
+            window.close();
+        }
+
         window.display();
     }
 }
@@ -221,7 +236,7 @@ int main() {
             {
                 switch (menu.getSelectedMenuNumber())
                 {
-                case 0:startGame(window, clock);   break;
+                case 0:startGame(clock);   break;
                 case 2:Options();  break;
                 case 3:Tutorial(); break;
                 //case 2:;  break;
@@ -406,7 +421,7 @@ void savingScreen() {
     titulEnter.setLetterSpacing(2);
     titulEnter.setFillColor(sf::Color::White);
     titulEnter.setPosition(20, 10);
-    sf::Text txtEnter("Press Enter to save and exit.", fontArial, 30);
+    sf::Text txtEnter("Press Esc to save and exit.", fontArial, 30);
     txtEnter.setLetterSpacing(2);
     txtEnter.setFillColor(sf::Color::White);
     txtEnter.setPosition(20, 60);
@@ -415,7 +430,7 @@ void savingScreen() {
     titulReturn.setLetterSpacing(2);
     titulReturn.setFillColor(sf::Color::White);
     titulReturn.setPosition(20, 100);
-    sf::Text txtReturn("Press Esc to continue game.", fontArial, 30);
+    sf::Text txtReturn("Press Enter to continue game.", fontArial, 30);
     txtReturn.setLetterSpacing(2);
     txtReturn.setFillColor(sf::Color::White);
     txtReturn.setPosition(20, 150);
