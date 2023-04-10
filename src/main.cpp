@@ -2,8 +2,12 @@
 
 void Options();
 void Tutorial();
+void savingScreen();
 
-void startGame(sf::RenderWindow &window, sf::Clock &clock) {
+void startGame(sf::Clock &clock) {
+    sf::RenderWindow window(sf::VideoMode((WIDTH + 6) * 32, WIDTH * 32), "Byte Back: The Robot Uprising", sf::Style::Close | sf::Style::Titlebar);
+    window.setFramerateLimit(60);
+    window.setMouseCursorVisible(false);
     std::vector<Bullet> bullets;
     std::vector<Enemy> enemies;
     int lives = 5;
@@ -93,8 +97,10 @@ void startGame(sf::RenderWindow &window, sf::Clock &clock) {
             if (event.type == sf::Event::Closed) window.close();
             if (event.type == sf::Event::KeyPressed)
             {
-                // Закрываем окно
-                if (event.key.code == sf::Keyboard::Escape) window.close();
+                if (event.key.code == sf::Keyboard::Escape) {
+                    savingScreen();
+                    window.close();
+                }
             }
         }
 
@@ -191,6 +197,7 @@ int main() {
     window.setMouseCursorVisible(false);
     sf::Clock clock;
     float delay = 0;
+    int gameLevel = 0;
 
     TileMap menuMap;
     int map[729] = { 0 };
@@ -244,10 +251,10 @@ int main() {
             {
                 switch (menu.getSelectedMenuNumber())
                 {
-                case 0:startGame(window, clock);   break;
+                case 0:startGame(clock);   break;
                 case 2:Options();  break;
                 case 3:Tutorial(); break;
-                //case 2:About_Game();  break;
+                //case 2:;  break;
                 case 4:window.close(); break;
 
                 }
@@ -391,6 +398,60 @@ void Tutorial() {
         window.draw(robot1);
         window.draw(robot2);
         window.draw(robot3);
+        window.display();
+    }
+}
+
+void savingScreen() {
+    sf::RenderWindow window(sf::VideoMode((WIDTH + 6) * 32, WIDTH * 32), "Byte Back: The Robot Uprising", sf::Style::Close | sf::Style::Titlebar);
+    window.setFramerateLimit(60);
+    window.setMouseCursorVisible(false);
+
+    TileMap menuMap;
+    int map[729] = { 0 };
+    menuMap.load("images/tileset.png", sf::Vector2u(32, 32), map, WIDTH + 6, WIDTH);
+
+    sf::Font fontPixel;
+    fontPixel.loadFromFile("fonts/pixel.ttf");
+    sf::Font fontArial;
+    fontArial.loadFromFile("fonts/arial.ttf");
+
+    sf::Text titulEnter("Enter", fontPixel, 50);
+    titulEnter.setLetterSpacing(2);
+    titulEnter.setFillColor(sf::Color::White);
+    titulEnter.setPosition(20, 10);
+    sf::Text txtEnter("Press Enter to save and exit.", fontArial, 30);
+    txtEnter.setLetterSpacing(2);
+    txtEnter.setFillColor(sf::Color::White);
+    txtEnter.setPosition(20, 60);
+
+    sf::Text titulReturn("Return", fontPixel, 50);
+    titulReturn.setLetterSpacing(2);
+    titulReturn.setFillColor(sf::Color::White);
+    titulReturn.setPosition(20, 100);
+    sf::Text txtReturn("Press Esc to continue game.", fontArial, 30);
+    txtReturn.setLetterSpacing(2);
+    txtReturn.setFillColor(sf::Color::White);
+    txtReturn.setPosition(20, 150);
+
+    while (window.isOpen())
+    {
+        sf::Event event;
+        while (window.pollEvent(event))
+        {
+            if (event.type == sf::Event::Closed) window.close();
+            if (event.type == sf::Event::KeyPressed)
+            {
+                if (event.key.code == sf::Keyboard::Escape) window.close();
+                if (event.key.code == sf::Keyboard::Return) window.close();
+            }
+        }
+        window.clear();
+        window.draw(menuMap);
+        window.draw(titulEnter);
+        window.draw(txtEnter);
+        window.draw(titulReturn);
+        window.draw(txtReturn);
         window.display();
     }
 }
