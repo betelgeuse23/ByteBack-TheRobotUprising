@@ -1,6 +1,6 @@
 #include "bullet.h"
 
-Bullet::Bullet(sf::Vector2f pos, char dir) {
+Bullet::Bullet(sf::Vector2f pos, char dir, int dmg) : damage(dmg) {
 	position = pos;
 	if (dir == 'd' || dir == 'n') velocity = sf::Vector2f(0, 5.0);
 	else if (dir == 'u') velocity = sf::Vector2f(0, -5.0);
@@ -10,7 +10,7 @@ Bullet::Bullet(sf::Vector2f pos, char dir) {
 }
 
 sf::Vector2f Bullet::update(float dt) {
-	position += velocity * dt;
+	position += velocity * dt * (float)0.09;
 	return position;
 }
 
@@ -22,25 +22,31 @@ char Bullet::getDirection() {
 	return direction;
 }
 
-bool Bullet::checkCollisionsWithEnemy(std::vector<Enemy>& enemies) {
-	int tileEnemy = 0;
-	int tileBullet = int(position.x / 32 + 0.5) + int(position.y / 32 + 0.5) * 21;
-	for (auto& enemy : enemies) {
-		tileEnemy = int(position.x / 32 + 0.5) + int(position.y / 32 + 0.5) * 21;
-		if (tileBullet == tileEnemy) enemy.doDamage(10);
-	}
-}
-
-bool Bullet::checkCollisionsWithObstacle(int* obstacles) {
-	int tile = int(position.x / 32 + 0.5) + int(position.y / 32 + 0.5) * 21;
-	if (obstacles[tile] == 5) return true;
-	else if (obstacles[tile] == 2) {
-		obstacles[tile] = 1;
+bool Bullet::checkCollisions(Level* level) {
+	int tileBullet = std::roundf(position.x / 32) + std::roundf(position.y / 32) * 21;
+	if (position.y < 0 && direction == 'u' ||
+		position.y > 672 && (direction == 'd' || direction == 'n') ||
+		position.x < 0 && direction == 'l' ||
+		position.x > 672 && direction == 'r') return true;
+	else if (level->map[tileBullet] == 5) return true;
+	else if (level->map[tileBullet] == 2 || level->map[tileBullet] == 1) {
+		level->map[tileBullet]--;
 		return true;
-	}
-	else if (obstacles[tile] == 1) {
-		obstacles[tile] = 0;
-		return true;
+	} else {
+		int tileEnemy = level->player->getPosition().x + level->player->getPosition().y * 21;
+		if (tileBullet == tileEnemy) {
+			level->player->doDamage();
+			return true;
+		}
+		if (!(level->enemies.empty())) {
+			for (auto& enemy : level->enemies) {
+				tileEnemy = enemy->getPosition().x + enemy->getPosition().y * 21;
+				if (tileBullet == tileEnemy) {
+					enemy->doDamage(1);
+					return true;
+				}
+			}
+		}
 	}
 	return false;
 }

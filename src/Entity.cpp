@@ -8,9 +8,8 @@ Entity::Entity(std::string texture, sf::Vector2i position) {
 	this->sprite.setPosition(sf::Vector2f(position * cell));
 }
 
-void Entity::initPatfind(const int* level, sf::Vector2i size, std::map<int, int> costs, std::vector<Entity*>*  entities) {
-	pf = PathFinder(level, size, costs);
-	pf.initEntities(entities);
+void Entity::initPatfind(Level* level, std::map<int, int> costs) {
+	pf = PathFinder(level, this, costs);
 }
 
 void Entity::update() {
@@ -32,7 +31,7 @@ void Entity::animate(State st, int fr) {
 void Entity::move(sf::Vector2i dest) {
 	if (pf.isInit() && state == Still) {
 		clock.restart();
-		direction = pf.pathfind(position, dest);
+		direction = pf.pathfind(dest);
 		state = Moving;
 	}
 	if (direction) lastDirection = direction;
@@ -73,15 +72,16 @@ void Entity::move() {
 
 
 
-PathFinder::PathFinder(const int* level, sf::Vector2i size, std::map<int, int> costs)
-	: size(size), accesible(std::vector<std::vector<int>>(size.x, std::vector<int>(size.y))), level(level), costs(costs), init(true) {
-	makeCosts();
+PathFinder::PathFinder(Level* level, Entity* that, std::map<int, int> costs)
+	: level(level), that(that), accesible(std::vector<std::vector<int>>(level->size.x, std::vector<int>(level->size.y))), costs(costs), init(true) {
+	makeCosts(false);
 }
 
-Direction PathFinder::pathfind(sf::Vector2i pos, sf::Vector2i dest) {
+Direction PathFinder::pathfind(sf::Vector2i dest) {
+	sf::Vector2i pos = that->getPosition(), size = level->size;
 	if(!(init) || dest.x < 0 || dest.y < 0 || dest.x >= size.x || dest.y >= size.y || pos.x < 0 || pos.y < 0 || pos.x >= size.x || pos.y >= size.y) return Direction::None;
 
-	makeCosts();
+	makeCosts(true);
 	
 	struct Node {
 		sf::Vector2i v;
@@ -141,23 +141,54 @@ Direction PathFinder::pathfind(sf::Vector2i pos, sf::Vector2i dest) {
 
 void PathFinder::info() {
 	if (accesible.empty()) std::cout << "Empty" << std::endl;
-	else Utils::vecCout(size, accesible);
+	else Utils::vecCout(level->size, accesible);
 }
 
 bool PathFinder::isAccesible(const Direction dir, const sf::Vector2i pos) {
-	makeCosts();
+	makeCosts(false);
 	sf::Vector2i posN = pos + Utils::makeDir(dir);
 
-	if (!(init) || posN.x < 0 || posN.y < 0 || posN.x >= size.x || posN.y >= size.y || !(accesible[posN.x][posN.y])) return false;
+	if (!(init) || posN.x < 0 || posN.y < 0 || posN.x >= level->size.x || posN.y >= level->size.y || !(accesible[posN.x][posN.y])) return false;
 	return true;
 }
 
-void PathFinder::makeCosts() {
-	for (int i = 0, t = 0; i < size.x; i++) for (int j = 0; j < size.y; j++) accesible[j][i] = costs[level[t++]];
-	/*if(entities) {
-		if (find) for (auto e : *entities) accesible[e->getPosition().x][e->getPosition().y] = 15;
-		else for (auto e : *entities) accesible[e->getPosition().x][e->getPosition().y] = 0;
-	}*/
+bool PathFinder::doTrace(const Direction dir, const sf::Vector2i pos, int range) {
+	makeCosts(false);
+	sf::Vector2i act_pos = pos;
+	while(isAccesible(dir, act_pos) && range-- > 0) act_pos += Utils::makeDir(dir);
+	makeCosts(true);
+	int ac = accesible[act_pos.x][act_pos.y];
+	std::cout << accesible[act_pos.x][act_pos.y] << std::endl;
+	if (ac > 1 && ac != 10) return true;
+	return false;
+}
+
+void PathFinder::makeCosts(bool search) {
+	for (int i = 0, t = 0; i < level->size.x; i++) for (int j = 0; j < level->size.y; j++) accesible[j][i] = costs[level->map[t++]];
+	if (!search) for (int i = 0, t = 0; i < level->size.x; i++) for (int j = 0; j < level->size.y; j++) if (accesible[j][i] > 1) accesible[j][i] = 0;
+	if (!level->enemies.empty()) {
+		for (auto& e : level->enemies) {
+			if (e == that) continue;
+			sf::Vector2i pos = e->getPosition(), size = level->size;
+			Direction dir = e->getDirection();
+			if (pos.y >= 0 && pos.y < size.y && pos.x >= 0 && pos.x < size.x) accesible[pos.x][pos.y] = search ? 10 : 0;
+			pos += Utils::makeDir(dir);
+			if(pos.y >= 0 && pos.y < size.y && pos.x >= 0 && pos.x < size.x) accesible[pos.x][pos.y] = search ? 7 : 0;
+		}
+	}
+	if (search && !level->bullets.empty()) {
+		for (auto& b : level->bullets) {
+			sf::Vector2i pos = Utils::gPos(b->getPosition());
+			accesible[pos.x][pos.y] = 100;
+		}
+	}
+	if (level->player) {
+		sf::Vector2i pos = level->player->getPosition(), size = level->size;
+		Direction dir = level->player->getDirection();
+		if (pos.y >= 0 && pos.y < size.y && pos.x >= 0 && pos.x < size.x) accesible[pos.x][pos.y] = search?20:0;
+		pos += Utils::makeDir(dir);
+		if (pos.y >= 0 && pos.y < size.y && pos.x >= 0 && pos.x < size.x) accesible[pos.x][pos.y] += search ? 5 : 0;
+	}
 }
 
 
@@ -190,7 +221,7 @@ void Utils::vecCout(sf::Vector2i size, std::vector<std::vector<int>> vec) {
 
 bool Enemy::doDamage(int d) {
 	health = std::max(0, health - d);
-	if (health = 0) state = Dead;
+	if (health == 0) state = Dead;
 	return state != Dead;
 }
 
@@ -200,8 +231,55 @@ void Enemy::initStats(int h, int r, float s) {
 	speed = s;
 }
 
+void Enemy::shoot(Level* level, Direction dir) {
+	if (isCharged()) {
+		level->bullets.push_back(new Bullet(position + Utils::makeDir(dir), dir, 1));
+	}
+}
+
+bool Enemy::isCharged() {
+	if (fire.getElapsedTime().asSeconds() > 1) { fire.restart(); return true; }
+	else return false;
+};
+
+void Enemy::update() {
+	Direction dir = pf.pathfind(pf.getLevel()->base);
+	move(dir);
+	if (pf.doTrace(dir, this->position, 10)) { shoot(pf.getLevel(), direction); std::cout << "u"; }
+	else if (pf.doTrace(Up, this->position, 10)) { shoot(pf.getLevel(), Up); }
+	else if (pf.doTrace(Down, this->position, 10)) { shoot(pf.getLevel(), Down); }
+	else if (pf.doTrace(Left, this->position, 10)) { shoot(pf.getLevel(), Left); }
+	else if (pf.doTrace(Right, this->position, 10)) { shoot(pf.getLevel(), Right); }
+	if (state == Moving) move();
+}
+
 bool Player::doDamage() {
-	if(--lives > 0) setPosition(spawn);
-	else state = Dead;
-	return state == Dead;
+	lives = std::max(0, lives - 1);
+	setPosition(spawn);
+	if (lives == 0) state = Dead;
+	return state != Dead;
+}
+
+void Player::bonusSpeed() {
+	clock.restart();
+	damage = 1;
+	speed += 0.1;
+}
+
+void Player::bonusLives() {
+	lives++;
+}
+
+void Player::bonusDamage() {
+	clock.restart();
+	speed = 0.2;
+	damage += 1;
+}
+
+void Player::update() {
+	if (state == Moving) move();
+	if ((damage > 1 || speed > 0.2) && clock.getElapsedTime().asSeconds() > 2) {
+		damage = 1;
+		speed = 0.2;
+	}
 }

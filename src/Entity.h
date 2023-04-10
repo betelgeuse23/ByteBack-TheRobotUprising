@@ -5,9 +5,10 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <iostream>
+#include "bullet.h"
 
 enum Direction {
-    None, Up, Down, Left, Right
+    None = 'n', Up = 'u', Down = 'd', Left = 'l', Right = 'r'
 };
 
 enum State {
@@ -15,35 +16,49 @@ enum State {
 };
 
 class Entity;
+class Enemy;
+class Player;
+class Bonus;
+class Bullet;
+
+struct Level {
+    int* map = nullptr;
+    sf::Vector2i size;
+    sf::Vector2i base;
+    std::vector<Bullet*> bullets;
+    std::vector<Enemy*> enemies;
+    std::vector<Bonus*> bonuses;
+    Player* player = nullptr;
+};
 
 class PathFinder {
 public:
     PathFinder() = default;
-    PathFinder(const int*, sf::Vector2i, std::map<int, int>);
-    Direction pathfind(sf::Vector2i, sf::Vector2i);
-
-    void initEntities(std::vector<Entity*>* e) { entities = e;};
+    PathFinder(Level*, Entity*, std::map<int, int>);
+    Direction pathfind(sf::Vector2i);
     
     void info();
     bool isInit() { return init; };
     bool isAccesible(const Direction, const sf::Vector2i);
+    bool doTrace(const Direction, const sf::Vector2i, int);
 
+    Level* getLevel() { return level; };
     std::vector<std::vector<int>>* getAcceses() { return &accesible; };
 private:
-    void makeCosts();
-    const int* level;
-    std::vector<std::vector<int>> accesible;
-    std::vector<Entity*>* entities = nullptr;
+    Level* level;
+    Entity* that;
     std::map<int, int> costs;
-    sf::Vector2i size;
+    std::vector<std::vector<int>> accesible;
     bool init = false;
+
+    void makeCosts(bool);
 };
 
 class Entity {
 public:
     Entity(std::string, sf::Vector2i);
     inline void draw(sf::RenderWindow& window) { window.draw(sprite); };
-    void initPatfind(const int*, sf::Vector2i, std::map<int, int>, std::vector<Entity*>*);
+    void initPatfind(Level*, std::map<int, int>);
     void initAnimation(std::map<State, int> a) { animations = a; };
 
     void move(sf::Vector2i);
@@ -65,7 +80,7 @@ protected:
     sf::Vector2i position;
     std::map<State, int> animations;
     Direction direction = None;
-    Direction lastDirection = None;
+    Direction lastDirection = Down;
     State state = Still;
     float speed = (float)0.1;
 
@@ -84,10 +99,16 @@ public:
 
 class Enemy : public Entity {
 public:
-    Enemy(std::string str, sf::Vector2i pos) : Entity(str, pos) {};
+    Enemy(std::string str, sf::Vector2i pos) : Entity(str, pos) { animations = { {Moving, 4} }; };
+    void makeTarget() { target = pf.getLevel()->base; }
     void initStats(int, int, float);
     bool doDamage(int);
+    void shoot(Level*, Direction);
+    void update();
+    bool isCharged();
 private:
+    sf::Vector2i target;
+    sf::Clock fire;
     int health = 1;
     int range = 10;
 };
@@ -99,9 +120,18 @@ public:
 
     int getLives() { return lives; };
     Direction getLastDirection() { return lastDirection; };
+    int getDamage() { return damage; };
+    void update();
+
+    void bonusSpeed();
+    void bonusLives();
+    void bonusDamage();
 
     void setSpawn(sf::Vector2i s) { spawn = s; };
 private:
+    sf::Clock effect;
+    sf::Clock fire;
+    bool charge;
     sf::Vector2i spawn;
     int lives = 5;
     int damage = 1;
