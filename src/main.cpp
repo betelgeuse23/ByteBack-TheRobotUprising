@@ -6,6 +6,7 @@ void Tutorial();
 void startGame(sf::RenderWindow &window, sf::Clock &clock) {
     std::vector<Bullet> bullets;
     std::vector<Enemy> enemies;
+    int lives = 5;
 
     // текстуры
     sf::Texture characterTexture;
@@ -21,6 +22,12 @@ void startGame(sf::RenderWindow &window, sf::Clock &clock) {
     bulletSprite.setTexture(bulletTexture);
     bulletSprite.setTextureRect(sf::IntRect(0, 0, 31, 31));
 
+    sf::Texture heartTexture;
+    heartTexture.loadFromFile("images/bonusesbig.png");
+    sf::Sprite heartSprite;
+    heartSprite.setTexture(heartTexture);
+    heartSprite.setTextureRect(sf::IntRect(0, 0, 95, 95));
+
     // текст
     sf::Font font;
     font.loadFromFile("fonts/pixel.ttf");
@@ -29,11 +36,6 @@ void startGame(sf::RenderWindow &window, sf::Clock &clock) {
     healthText.setLetterSpacing(1);
     healthText.setFillColor(sf::Color::White);
     healthText.setPosition(680, 10);
-
-    sf::Text enemiesText("Enemies", font, 32);
-    enemiesText.setLetterSpacing(1);
-    enemiesText.setFillColor(sf::Color::White);
-    enemiesText.setPosition(680, 150);
 
     // карта
     int level[] = {
@@ -151,7 +153,11 @@ void startGame(sf::RenderWindow &window, sf::Clock &clock) {
         window.clear(sf::Color::Black);
         window.draw(map);
         window.draw(healthText);
-        window.draw(enemiesText);
+        for (int i = 0; i < lives; i++)
+        {
+            heartSprite.setPosition(620 + (i + 1) * 32 , 20);
+            window.draw(heartSprite);
+        }
 
         for (auto& bullet : bullets) {
             bullet.update(0.09 * time);
