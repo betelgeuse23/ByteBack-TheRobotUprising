@@ -153,12 +153,11 @@ bool PathFinder::isAccesible(const Direction dir, const sf::Vector2i pos) {
 }
 
 bool PathFinder::doTrace(const Direction dir, const sf::Vector2i pos, int range) {
-	makeCosts(false);
 	sf::Vector2i act_pos = pos;
-	while(isAccesible(dir, act_pos) && range-- > 0) act_pos += Utils::makeDir(dir);
+	int r = 0;
+	while (isAccesible(dir, act_pos) && range > r++) act_pos += Utils::makeDir(dir);
 	makeCosts(true);
 	int ac = accesible[act_pos.x][act_pos.y];
-	std::cout << accesible[act_pos.x][act_pos.y] << std::endl;
 	if (ac > 1 && ac != 10) return true;
 	return false;
 }
@@ -173,7 +172,7 @@ void PathFinder::makeCosts(bool search) {
 			Direction dir = e->getDirection();
 			if (pos.y >= 0 && pos.y < size.y && pos.x >= 0 && pos.x < size.x) accesible[pos.x][pos.y] = search ? 10 : 0;
 			pos += Utils::makeDir(dir);
-			if(pos.y >= 0 && pos.y < size.y && pos.x >= 0 && pos.x < size.x) accesible[pos.x][pos.y] = search ? 7 : 0;
+			if(pos.y >= 0 && pos.y < size.y && pos.x >= 0 && pos.x < size.x) accesible[pos.x][pos.y] += search ? 5 : 0;
 		}
 	}
 	if (search && !level->bullets.empty()) {
