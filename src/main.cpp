@@ -347,13 +347,26 @@ void Tutorial() {
     sf::Text BonusTitul("Grab it!", fontPixel, 40);
     BonusTitul.setLetterSpacing(1);
     BonusTitul.setFillColor(sf::Color::White);
-    BonusTitul.setPosition(510, 310);
+    BonusTitul.setPosition(530, 310);
+
+    sf::Text RememberTitul("Remember!", fontPixel, 40);
+    RememberTitul.setLetterSpacing(1);
+    RememberTitul.setFillColor(sf::Color::White);
+    RememberTitul.setPosition(32, 510);
+
+    sf::Text RememberText1("You can walk on bars, but not on water.", fontArial, 20);
+    RememberText1.setFillColor(sf::Color::White);
+    RememberText1.setPosition(32, 570);
+
+    sf::Text RememberText2("Your enemies can walk on water, but they can't walk on bars.", fontArial, 20);
+    RememberText2.setFillColor(sf::Color::White);
+    RememberText2.setPosition(32, 600);
 
     sf::Texture bonusTexture;
     bonusTexture.loadFromFile("images/bonusesbig.png");
     sf::Sprite bonuses;
     bonuses.setTexture(bonusTexture);
-    bonuses.setPosition(470, 380);
+    bonuses.setPosition(500, 380);
 
     sf::Texture robot1Texture;
     robot1Texture.loadFromFile("images/robot1big.png");
@@ -394,6 +407,9 @@ void Tutorial() {
         window.draw(plotText5);
         window.draw(EnemyTitul);
         window.draw(BonusTitul);
+        window.draw(RememberTitul);
+        window.draw(RememberText1);
+        window.draw(RememberText2);
         window.draw(bonuses);
         window.draw(robot1);
         window.draw(robot2);
