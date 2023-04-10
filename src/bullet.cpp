@@ -28,7 +28,9 @@ bool Bullet::checkCollisionsWithEnemy(std::vector<Enemy>& enemies) {
 	for (auto& enemy : enemies) {
 		tileEnemy = int(position.x / 32 + 0.5) + int(position.y / 32 + 0.5) * 21;
 		if (tileBullet == tileEnemy) enemy.doDamage(10);
+		return true;
 	}
+	return false;
 }
 
 bool Bullet::checkCollisionsWithObstacle(int* obstacles) {

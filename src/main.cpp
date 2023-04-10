@@ -33,7 +33,7 @@ void startGame(sf::RenderWindow &window, sf::Clock &clock) {
     sf::Text enemiesText("Enemies", font, 32);
     enemiesText.setLetterSpacing(1);
     enemiesText.setFillColor(sf::Color::White);
-    enemiesText.setPosition(680, 200);
+    enemiesText.setPosition(680, 150);
 
     // карта
     int level[] = {
@@ -291,12 +291,74 @@ void Tutorial() {
     sf::RenderWindow window(sf::VideoMode((WIDTH + 6) * 32, WIDTH * 32), "Byte Back: The Robot Uprising", sf::Style::Close | sf::Style::Titlebar);
     window.setFramerateLimit(60);
     window.setMouseCursorVisible(false);
-    sf::Clock clock;
-    float delay = 0;
 
     TileMap menuMap;
     int map[729] = { 0 };
     menuMap.load("images/tileset.png", sf::Vector2u(32, 32), map, WIDTH + 6, WIDTH);
+
+    sf::Font fontPixel;
+    fontPixel.loadFromFile("fonts/pixel.ttf");
+    sf::Font fontArial;
+    fontArial.loadFromFile("fonts/arial.ttf");
+
+    sf::Text plotTitul("Plot", fontPixel, 60);
+    plotTitul.setLetterSpacing(2);
+    plotTitul.setFillColor(sf::Color::White);
+    plotTitul.setPosition(32, 32);
+
+    sf::Text plotText1("You are a retired intelligence sergeant who has been reinstated and sent on a mission", fontArial, 20);
+    plotText1.setFillColor(sf::Color::White);
+    plotText1.setPosition(32, 120);
+
+    sf::Text plotText2("to save the city from a robot invasion.These robots were once loyal to humans and", fontArial, 20);
+    plotText2.setFillColor(sf::Color::White);
+    plotText2.setPosition(32, 150);
+
+    sf::Text plotText3("helped them in their daily lives, but have been reprogrammed by a group of hackers", fontArial, 20);
+    plotText3.setFillColor(sf::Color::White);
+    plotText3.setPosition(32, 180);
+
+    sf::Text plotText4("who want to take over the city.Your task is to protect the computing cluster until", fontArial, 20);
+    plotText4.setFillColor(sf::Color::White);
+    plotText4.setPosition(32, 210);
+
+    sf::Text plotText5("your colleagues can take back control of the robots.", fontArial, 20);
+    plotText5.setFillColor(sf::Color::White);
+    plotText5.setPosition(32, 240);
+
+    sf::Text EnemyTitul("Beware!", fontPixel, 40);
+    EnemyTitul.setLetterSpacing(1);
+    EnemyTitul.setFillColor(sf::Color::White);
+    EnemyTitul.setPosition(110, 310);
+
+    sf::Text BonusTitul("Grab it!", fontPixel, 40);
+    BonusTitul.setLetterSpacing(1);
+    BonusTitul.setFillColor(sf::Color::White);
+    BonusTitul.setPosition(510, 310);
+
+    sf::Texture bonusTexture;
+    bonusTexture.loadFromFile("images/bonusesbig.png");
+    sf::Sprite bonuses;
+    bonuses.setTexture(bonusTexture);
+    bonuses.setPosition(470, 380);
+
+    sf::Texture robot1Texture;
+    robot1Texture.loadFromFile("images/robot1big.png");
+    sf::Sprite robot1;
+    robot1.setTexture(robot1Texture);
+    robot1.setPosition(20, 380);
+
+    sf::Texture robot2Texture;
+    robot2Texture.loadFromFile("images/robot2big.png");
+    sf::Sprite robot2;
+    robot2.setTexture(robot2Texture);
+    robot2.setPosition(160, 380);
+
+    sf::Texture robot3Texture;
+    robot3Texture.loadFromFile("images/robot3big.png");
+    sf::Sprite robot3;
+    robot3.setTexture(robot3Texture);
+    robot3.setPosition(300, 380);
 
     while (window.isOpen())
     {
@@ -311,6 +373,18 @@ void Tutorial() {
         }
         window.clear();
         window.draw(menuMap);
+        window.draw(plotTitul);
+        window.draw(plotText1);
+        window.draw(plotText2);
+        window.draw(plotText3);
+        window.draw(plotText4);
+        window.draw(plotText5);
+        window.draw(EnemyTitul);
+        window.draw(BonusTitul);
+        window.draw(bonuses);
+        window.draw(robot1);
+        window.draw(robot2);
+        window.draw(robot3);
         window.display();
     }
 }
