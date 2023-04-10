@@ -1,10 +1,6 @@
 ﻿#include "main.h"
 
-void startGame() {
-    sf::RenderWindow window(sf::VideoMode((WIDTH + 6) * 32, WIDTH * 32), "Byte Back: The Robot Uprising", sf::Style::Close | sf::Style::Titlebar);
-    window.setFramerateLimit(60);
-    window.setMouseCursorVisible(false);
-    sf::Clock clock;
+void startGame(sf::RenderWindow &window, sf::Clock &clock) {
     std::vector<Bullet> bullets;
 
     // текстуры
@@ -183,6 +179,7 @@ void startGame() {
 int main() {
     sf::RenderWindow window(sf::VideoMode((WIDTH + 6) * 32, WIDTH * 32), "Byte Back: The Robot Uprising", sf::Style::Close | sf::Style::Titlebar);
     window.setFramerateLimit(60);
+    window.setMouseCursorVisible(false);
     sf::Clock clock;
     float delay = 0;
 
@@ -211,16 +208,14 @@ int main() {
     sf::String name_menu[]{ L"START", L"CONTINUE", L"SETTINGS", L"ABOUT", L"EXIT" };
     Menu menu(window, name_menu);
 
-    while (window.isOpen())
-    {
+    while (window.isOpen()) {
         sf::Event event;
 
         float time = clock.getElapsedTime().asMilliseconds();
         clock.restart();
         delay += time;
 
-        while (window.pollEvent(event))
-        {
+        while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) { window.close(); }
             if (event.key.code == sf::Keyboard::Up) { 
                 if (delay > 300)
@@ -240,21 +235,21 @@ int main() {
             {
                 switch (menu.getSelectedMenuNumber())
                 {
-                case 0:startGame();   break;
+                case 0:startGame(window, clock);   break;
                 /*case 1:Options();     break;
                 case 2:About_Game();  break;*/
                 case 4:window.close(); break;
 
                 }
             }
-            window.clear(sf::Color::Black);
-            window.draw(menuMap);
-            window.draw(titulFirst);
-            window.draw(titulSecond);
-            menu.draw();
-            point.setPosition(40, (menu.getSelectedMenuNumber() * 2 + 6) * 32);
-            window.draw(point);
         }
+        window.clear(sf::Color::Black);
+        window.draw(menuMap);
+        window.draw(titulFirst);
+        window.draw(titulSecond);
+        menu.draw();
+        point.setPosition(40, (menu.getSelectedMenuNumber() * 2 + 6) * 32);
+        window.draw(point);
         window.display();
     }
     return 0;
