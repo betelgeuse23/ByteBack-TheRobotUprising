@@ -20,7 +20,7 @@ void Entity::setPosition(sf::Vector2i position) {
 	this->position = position;
 	state = Still;
 	animate(Still, 0);
-	sprite.setPosition(sf::Vector2f(position));
+	sprite.setPosition(sf::Vector2f(position*cell));
 }
 
 void Entity::animate(State st, int fr) {
@@ -152,19 +152,20 @@ bool PathFinder::isAccesible(const Direction dir, const sf::Vector2i pos) {
 	return true;
 }
 
-bool PathFinder::doTrace(const Direction dir, const sf::Vector2i pos, int range) {
+bool PathFinder::doTrace(Direction dir, const sf::Vector2i pos, int range) {
 	sf::Vector2i act_pos = pos;
 	int r = 0;
-	while (isAccesible(dir, act_pos) && range > r++) act_pos += Utils::makeDir(dir);
+	while (isAccesible(dir, act_pos) && range > r++) { act_pos += Utils::makeDir(dir); }
+	act_pos += Utils::makeDir(dir);
+	if (act_pos.x < 0 || act_pos.y < 0 || act_pos.x >= level->size.x || act_pos.y >= level->size.y) act_pos -= Utils::makeDir(dir);
 	makeCosts(true);
 	int ac = accesible[act_pos.x][act_pos.y];
-	if (ac > 1 && ac != 10) return true;
+	if (ac == 20 || ac == 2 || ac == 3) return true;
 	return false;
 }
 
 void PathFinder::makeCosts(bool search) {
-	for (int i = 0, t = 0; i < level->size.x; i++) for (int j = 0; j < level->size.y; j++) accesible[j][i] = costs[level->map[t++]];
-	if (!search) for (int i = 0, t = 0; i < level->size.x; i++) for (int j = 0; j < level->size.y; j++) if (accesible[j][i] > 1) accesible[j][i] = 0;
+	for (int i = 0, t = 0; i < level->size.x; i++) for (int j = 0; j < level->size.y; j++) accesible[j][i] = search?costs[level->map[t++]]:(costs[level->map[t++]]!= 1?0:1);
 	if (!level->enemies.empty()) {
 		for (auto& e : level->enemies) {
 			if (e == that) continue;
@@ -184,7 +185,7 @@ void PathFinder::makeCosts(bool search) {
 	if (level->player) {
 		sf::Vector2i pos = level->player->getPosition(), size = level->size;
 		Direction dir = level->player->getDirection();
-		if (pos.y >= 0 && pos.y < size.y && pos.x >= 0 && pos.x < size.x) accesible[pos.x][pos.y] = search?20:0;
+		if (pos.y >= 0 && pos.y < size.y && pos.x >= 0 && pos.x < size.x) accesible[pos.x][pos.y] = search ? 20 : 0;
 		pos += Utils::makeDir(dir);
 		if (pos.y >= 0 && pos.y < size.y && pos.x >= 0 && pos.x < size.x) accesible[pos.x][pos.y] += search ? 5 : 0;
 	}
@@ -244,7 +245,7 @@ bool Enemy::isCharged() {
 void Enemy::update() {
 	Direction dir = pf.pathfind(pf.getLevel()->base);
 	move(dir);
-	if (pf.doTrace(dir, this->position, 10)) { shoot(pf.getLevel(), direction); std::cout << "u"; }
+	if (pf.doTrace(dir, this->position, 10)) { shoot(pf.getLevel(), direction); }
 	else if (pf.doTrace(Up, this->position, 10)) { shoot(pf.getLevel(), Up); }
 	else if (pf.doTrace(Down, this->position, 10)) { shoot(pf.getLevel(), Down); }
 	else if (pf.doTrace(Left, this->position, 10)) { shoot(pf.getLevel(), Left); }
