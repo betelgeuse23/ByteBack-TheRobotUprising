@@ -139,15 +139,15 @@ bool PathFinder::isAccesible(const Direction dir, const sf::Vector2i pos) {
 }
 
 bool PathFinder::doTrace(Direction dir, const sf::Vector2i pos, int range, bool prime) {
+	makeMatrix();
 	sf::Vector2i act_pos = pos;
 	int r = 0;
 	while (isAccesible(dir, act_pos) && range > r++) { act_pos += Utils::makeDir(dir); }
 	act_pos += Utils::makeDir(dir);
 	if (act_pos.x < 0 || act_pos.y < 0 || act_pos.x >= level->size.x || act_pos.y >= level->size.y) act_pos -= Utils::makeDir(dir);
-	makeCosts(pos, true);
-	int ac = accesible[act_pos.x][act_pos.y];
-	if (ac == 20 || ac == 25) return true;
-	if (prime && (ac == 2 || ac == 3 || ac == 7 || ac == 8)) return true;
+	int item = matrix[act_pos.x][act_pos.y];
+	if (item == 20) return true;
+	if (prime && (item == 1 || item == 2)) return true;
 	return false;
 }
 
@@ -181,7 +181,27 @@ void PathFinder::makeCosts(sf::Vector2i currPos, bool search) {
 			accesible[pos.x][pos.y] = 100;
 		}
 	}
+}
 
+void PathFinder::makeAccess() {
+	makeMatrix();
+	for (int i = 0; i < level->size.x; i++) for (int j = 0; j < level->size.y; j++) accesible[j][i] = costs[matrix[j][i]] != 1 ? 0 : 1;
+}
+
+void PathFinder::makeMatrix() {
+	for (int i = 0; i < level->size.x; i++) for (int j = 0; j < level->size.y; j++) matrix[j][i] = level->map[j][i];
+	if (!level->enemies.empty()) {
+		for (auto& e : level->enemies) {
+			sf::Vector2i pos = e->getPosition(), size = level->size;
+			if (pos.y >= 0 && pos.y < size.y && pos.x >= 0 && pos.x < size.x) matrix[pos.x][pos.y] = 10;
+		}
+	}
+	if (!level->players.empty()) {
+		for (auto& p : level->players) {
+			sf::Vector2i pos = p->getPosition(), size = level->size;
+			if (pos.y >= 0 && pos.y < size.y && pos.x >= 0 && pos.x < size.x) matrix[pos.x][pos.y] = 20;
+		}
+	}
 }
 
 
@@ -214,7 +234,11 @@ void Utils::vecCout(sf::Vector2i size, std::vector<std::vector<int>> vec) {
 
 bool Enemy::doDamage(int d) {
 	health = std::max(0, health - d);
-	if (health == 0) state = Dead;
+	if (health == 0) {
+		state = Dead;
+		int b = rand() % 10;
+		if(b < 5) pf->getLevel()->bonuses.push_back(new Bonus(Effects(b), position));
+	}
 	return state != Dead;
 }
 
@@ -251,38 +275,40 @@ void Enemy::update() {
 
 
 bool Player::doDamage(int dmg) {
-	lives = std::max(0, lives - dmg);
-	setPosition(spawn);
+	if (effect != Shield || dmg < 0) {
+		lives = std::max(0, lives - std::abs(dmg));
+		setPosition(spawn);
+	}
 	if (lives == 0) state = Dead;
 	return state != Dead;
 }
 
-void Player::bonusSpeed() {
-	clock.restart();
-	damage = 1;
-	speed += 0.1;
-}
+void Player::affect(Effects eff) {
+	effect = eff;
+	bonus.restart();
 
-void Player::bonusLives() {
-	lives++;
-}
+	if(eff != Speed) speed = 0.2;
+	else if (speed < 0.4) speed += 0.1;
 
-void Player::bonusDamage() {
-	clock.restart();
-	speed = 0.2;
-	damage += 1;
+	if(eff != Damage) damage = 1;
+	else if (damage < 3) damage += 1;
+
+	if(eff != Rate) rate = 1000;
+	else if (rate > 100) rate -= 300;
+
+	if (eff == Health) {
+		if(lives < 5) lives++;
+		effect = Spare;
+	}
 }
 
 void Player::update() {
 	if (state == Moving) move();
-	if ((damage > 1 || speed > 0.2) && clock.getElapsedTime().asSeconds() > 2) {
-		damage = 1;
-		speed = 0.2;
-	}
+	if (effect != Spare && bonus.getElapsedTime().asSeconds() > 4) affect(Spare);
 }
 
 bool Player::isCharged() {
-	if (fire.getElapsedTime().asSeconds() > 1) { fire.restart(); return true; }
+	if (fire.getElapsedTime().asMilliseconds() > rate) { fire.restart(); return true; }
 	else return false;
 };
 

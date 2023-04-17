@@ -7,9 +7,10 @@
 #include <vector>
 #include <iostream>
 #include "bullet.h"
+#include "Bonus.h"
 
 enum Direction {
-    None = 'n', Up = 'u', Down = 'd', Left = 'l', Right = 'r'
+    None, Up, Down, Left, Right
 };
 
 enum State {
@@ -21,6 +22,7 @@ class Enemy;
 class Player;
 class Bonus;
 class Bullet;
+enum Effects;
 
 struct Level {
     sf::Vector2i size;
@@ -45,7 +47,7 @@ struct Level {
 class PathFinder {
 public:
     PathFinder(Level* level, std::map<int, int> costs)
-        : level(level), accesible(std::vector<std::vector<int>>(level->size.x, std::vector<int>(level->size.y))), costs(costs) {};
+        : level(level), accesible(std::vector<std::vector<int>>(level->size.x, std::vector<int>(level->size.y))), costs(costs), matrix(std::vector<std::vector<int>>(level->size.x, std::vector<int>(level->size.y))) {};
 
     Direction pathfind(sf::Vector2i, sf::Vector2i);
     bool isAccesible(const Direction, const sf::Vector2i);
@@ -57,8 +59,10 @@ private:
     Level* level;
     std::map<int, int> costs;
     std::vector<std::vector<int>> accesible;
-
+    std::vector<std::vector<int>> matrix;
     void makeCosts(sf::Vector2i, bool);
+    void makeMatrix();
+    void makeAccess();
 };
 
 class Entity {
@@ -133,17 +137,18 @@ public:
     void update();
     void shoot(Level*);
 
-    void bonusSpeed();
-    void bonusLives();
-    void bonusDamage();
+    void affect(Effects);
 
     bool isCharged();
+    bool isShielded() { return effect == Effects(3); };
     void setSpawn(sf::Vector2i s) { spawn = s; };
 private:
-    sf::Clock effect;
+    sf::Clock bonus;
     sf::Clock fire;
     bool charge;
     sf::Vector2i spawn;
     int lives = 5;
     int damage = 1;
+    int rate = 1000;
+    Effects effect = Effects(5);
 };

@@ -16,7 +16,10 @@ bool Bullet::checkCollisions(Level* level) {
 
 	int tile = level->map[globalPos.x][globalPos.y];
 	if (tile == 1 || tile == 2 || tile == 5) {
-		if(tile != 5) level->map[globalPos.x][globalPos.y]--;
+		if (tile != 5) {
+			level->map[globalPos.x][globalPos.y]--;
+			if (damage > 1 && tile == 2) level->map[globalPos.x][globalPos.y]--;
+		}
 		return true;
 	}
 
