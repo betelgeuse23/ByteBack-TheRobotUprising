@@ -30,7 +30,7 @@ int main() {
     sf::Sprite menuSprite;
     menuSprite.setTexture(menuTexture);
 
-    sf::String name_menu[]{ L"START", L"CONTINUE", L"OPTIONS", L"TUTORIAL", L"QUIT" };
+    sf::String name_menu[]{ L"NEW GAME", L"CONTINUE", L"OPTIONS", L"TUTORIAL", L"QUIT" };
     Menu menu(window, name_menu);
     Game game;
 
@@ -61,10 +61,10 @@ int main() {
             {
                 switch (menu.getSelectedMenuNumber())
                 {
-                case 0:game.startGame(window, clock, menu);   break;
+                case 0:game.setLevel(1);  game.startGame(window, clock, menu);   break;
+                case 1: game.startGame(window, clock, menu);   break;
                 case 2:menu.Options(window);  break;
                 case 3:menu.Tutorial(window); break;
-                //case 2:;  break;
                 case 4:window.close(); break;
 
                 }
