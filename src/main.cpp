@@ -185,10 +185,6 @@ int main() {
     float delay = 0;
     int gameLevel = 0;
 
-    TileMap menuMap;
-    int map[729] = { 0 };
-    menuMap.load("images/tileset.png", sf::Vector2u(32, 32), map, WIDTH + 6, WIDTH);
-
     // текст
     sf::Font fontPixel;
     fontPixel.loadFromFile("fonts/pixel.ttf");
@@ -210,7 +206,6 @@ int main() {
     menuTexture.loadFromFile("images/menu.png");
     sf::Sprite menuSprite;
     menuSprite.setTexture(menuTexture);
-    menuSprite.setPosition(130, -90);
 
     sf::String name_menu[]{ L"START", L"CONTINUE", L"OPTIONS", L"TUTORIAL", L"QUIT" };
     Menu menu(window, name_menu);
@@ -252,13 +247,12 @@ int main() {
             }
         }
         window.clear(sf::Color::Black);
-        window.draw(menuMap);
+        window.draw(menuSprite);
         window.draw(titulFirst);
         window.draw(titulSecond);
         menu.draw();
         point.setPosition(40, (menu.getSelectedMenuNumber() * 2 + 6) * 32);
         window.draw(point);
-        window.draw(menuSprite);
         window.display();
     }
     return 0;
