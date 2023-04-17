@@ -145,10 +145,12 @@ void PathFinder::info() {
 }
 
 bool PathFinder::isAccesible(const Direction dir, const sf::Vector2i pos) {
+	if (!(init)) return false;
+
 	makeCosts(false);
 	sf::Vector2i posN = pos + Utils::makeDir(dir);
 
-	if (!(init) || posN.x < 0 || posN.y < 0 || posN.x >= level->size.x || posN.y >= level->size.y || !(accesible[posN.x][posN.y])) return false;
+	if (posN.x < 0 || posN.y < 0 || posN.x >= level->size.x || posN.y >= level->size.y || !(accesible[posN.x][posN.y])) return false;
 	return true;
 }
 
@@ -160,7 +162,7 @@ bool PathFinder::doTrace(Direction dir, const sf::Vector2i pos, int range) {
 	if (act_pos.x < 0 || act_pos.y < 0 || act_pos.x >= level->size.x || act_pos.y >= level->size.y) act_pos -= Utils::makeDir(dir);
 	makeCosts(true);
 	int ac = accesible[act_pos.x][act_pos.y];
-	if (ac == 20 || ac == 2 || ac == 3) return true;
+	if (ac == 20 || ac == 2 || ac == 3 || ac == 25 || ac == 7 || ac == 8) return true;
 	return false;
 }
 
@@ -204,7 +206,7 @@ sf::Vector2i Utils::makeDir(Direction dir) {
 }
 
 sf::Vector2i Utils::gPos(sf::Vector2f pos) {
-	return sf::Vector2i((int)(pos.x / cell), (int)(pos.y / cell));
+	return sf::Vector2i((int)((pos.x + (int)(cell/2)) / cell), (int)((pos.y + (int)(cell / 2)) / cell));
 }
 
 void Utils::vecCout(sf::Vector2i size, std::vector<std::vector<int>> vec) {
@@ -233,7 +235,7 @@ void Enemy::initStats(int h, int r, float s) {
 
 void Enemy::shoot(Level* level, Direction dir) {
 	if (isCharged()) {
-		level->bullets.push_back(new Bullet(position + Utils::makeDir(dir), dir, 1));
+		level->bullets.push_back(new Bullet(position, dir, 1, false));
 	}
 }
 
@@ -253,8 +255,10 @@ void Enemy::update() {
 	if (state == Moving) move();
 }
 
-bool Player::doDamage() {
-	lives = std::max(0, lives - 1);
+
+
+bool Player::doDamage(int dmg) {
+	lives = std::max(0, lives - dmg);
 	setPosition(spawn);
 	if (lives == 0) state = Dead;
 	return state != Dead;
@@ -281,5 +285,16 @@ void Player::update() {
 	if ((damage > 1 || speed > 0.2) && clock.getElapsedTime().asSeconds() > 2) {
 		damage = 1;
 		speed = 0.2;
+	}
+}
+
+bool Player::isCharged() {
+	if (fire.getElapsedTime().asSeconds() > 1) { fire.restart(); return true; }
+	else return false;
+};
+
+void Player::shoot(Level* level) {
+	if (isCharged()) {
+		level->bullets.push_back(new Bullet(position, lastDirection, damage, true));
 	}
 }

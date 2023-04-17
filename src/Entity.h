@@ -3,6 +3,7 @@
 #define cell 32
 
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <vector>
 #include <iostream>
 #include "bullet.h"
@@ -116,17 +117,20 @@ private:
 class Player : public Entity {
 public:
     Player(std::string str, sf::Vector2i pos) : Entity(str, pos), spawn(pos) { speed = (float)0.2; animations = { {Moving, 2} }; };
-    bool doDamage();
+    bool doDamage(int);
 
     int getLives() { return lives; };
     Direction getLastDirection() { return lastDirection; };
     int getDamage() { return damage; };
+    
     void update();
+    void shoot(Level*);
 
     void bonusSpeed();
     void bonusLives();
     void bonusDamage();
 
+    bool isCharged();
     void setSpawn(sf::Vector2i s) { spawn = s; };
 private:
     sf::Clock effect;

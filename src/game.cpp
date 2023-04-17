@@ -28,9 +28,6 @@ void Game::startGame(sf::RenderWindow& window, sf::Clock& clock, Menu& menu) {
     TileMap map;
     map.load("images/tileset.png", sf::Vector2u(32, 32), level, WIDTH, WIDTH);
 
-    bool isShooting = false;
-    float bulDelay = 0;
-
     Level level1;
     level1.size = sf::Vector2i(21, 21);
     level1.map = level;
@@ -45,19 +42,12 @@ void Game::startGame(sf::RenderWindow& window, sf::Clock& clock, Menu& menu) {
         e->makeTarget();
     }
 
-    float del = 0;
-
 
     // работа с окном
     while (window.isOpen())
     {
         float time = clock.getElapsedTime().asMilliseconds();
         clock.restart();
-
-        del += time;
-
-        if (isShooting) bulDelay = 0;
-        else bulDelay += time;
 
         sf::Event event;
         while (window.pollEvent(event))
@@ -86,12 +76,7 @@ void Game::startGame(sf::RenderWindow& window, sf::Clock& clock, Menu& menu) {
             level1.player->move(Down);
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
-            if (bulDelay > 500)
-            {
-                isShooting = true;
-                level1.bullets.push_back(new Bullet(level1.player->getPosition() + Utils::makeDir(level1.player->getLastDirection()), level1.player->getLastDirection(), level1.player->getDamage()));
-            }
-            else isShooting = false;
+            level1.player->shoot(&level1);
         }
 
         window.clear(sf::Color::Black);
@@ -103,11 +88,7 @@ void Game::startGame(sf::RenderWindow& window, sf::Clock& clock, Menu& menu) {
                 e->update();
                 e->draw(window);
                 if (e->getPosition() == level1.base) {
-                    level1.player->doDamage();
-                    level1.player->doDamage();
-                    level1.player->doDamage();
-                    level1.player->doDamage();
-                    level1.player->doDamage();
+                    level1.player->doDamage(5);
                 }
             }
             else {

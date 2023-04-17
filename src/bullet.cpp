@@ -1,6 +1,6 @@
 #include "bullet.h"
 
-Bullet::Bullet(sf::Vector2f pos, char dir, int dmg) : damage(dmg) {
+Bullet::Bullet(sf::Vector2f pos, char dir, int dmg, bool pl) : damage(dmg), players(pl) {
 	position = pos;
 	if (dir == 'd' || dir == 'n') velocity = sf::Vector2f(0, 5.0);
 	else if (dir == 'u') velocity = sf::Vector2f(0, -5.0);
@@ -23,30 +23,27 @@ char Bullet::getDirection() {
 }
 
 bool Bullet::checkCollisions(Level* level) {
-	int tileBullet = std::roundf(position.x / 32) + std::roundf(position.y / 32) * 21;
-	if (position.y < 0 && direction == 'u' ||
-		position.y > 672 && (direction == 'd' || direction == 'n') ||
-		position.x < 0 && direction == 'l' ||
-		position.x > 672 && direction == 'r') return true;
-	else if (level->map[tileBullet] == 5) return true;
-	else if (level->map[tileBullet] == 2 || level->map[tileBullet] == 1) {
-		level->map[tileBullet]--;
+	sf::Vector2i globalPos =  Utils::gPos(position) + Utils::makeDir(Direction(direction));
+	int tileBullet = globalPos.x + globalPos.y * level->size.x;
+	if (globalPos.y < 0 && direction == Direction::Up || globalPos.y >= level->size.y && direction == Direction::Down || globalPos.x < 0 && direction == Direction::Left || globalPos.x >= level->size.x && direction == Direction::Right)
 		return true;
-	} else {
-		int tileEnemy = level->player->getPosition().x + level->player->getPosition().y * 21;
-		if (tileBullet == tileEnemy) {
-			level->player->doDamage();
-			return true;
-		}
-		if (!(level->enemies.empty())) {
-			for (auto& enemy : level->enemies) {
-				tileEnemy = enemy->getPosition().x + enemy->getPosition().y * 21;
-				if (tileBullet == tileEnemy) {
-					enemy->doDamage(1);
-					return true;
-				}
-			}
-		}
+
+	int tile = level->map[tileBullet];
+	if (tile == 1 || tile == 2 || tile == 5) {
+		if(tile != 5) level->map[tileBullet]--;
+		return true;
 	}
+
+	if (!(players) && level->player->getPosition() == globalPos) {
+		level->player->doDamage(1);
+		return true;
+	}
+
+	if (players && !(level->enemies.empty()))
+		for (auto& enemy : level->enemies)
+			if (enemy->getPosition() == globalPos) {
+				enemy->doDamage(1);
+				return true;
+			}
 	return false;
 }
