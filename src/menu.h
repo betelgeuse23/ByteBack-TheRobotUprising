@@ -23,6 +23,8 @@ public:
 	void Options(sf::RenderWindow& window);
 	void Tutorial(sf::RenderWindow& window);
 	bool savingScreen(sf::RenderWindow& window);
+	void winScreen(sf::RenderWindow& window);
+	void loseScreen(sf::RenderWindow& window);
 
 private:
 	int mainMenuSelected;

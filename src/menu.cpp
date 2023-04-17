@@ -245,3 +245,69 @@ bool Menu::savingScreen(sf::RenderWindow& window) {
     }
     return 0;
 }
+
+void Menu::winScreen(sf::RenderWindow& window) {
+    sf::Font fontPixel;
+    fontPixel.loadFromFile("fonts/pixel.ttf");
+    sf::Font fontArial;
+    fontArial.loadFromFile("fonts/arial.ttf");
+
+    sf::Text titul("You won!", fontPixel, 80);
+    titul.setLetterSpacing(2);
+    titul.setFillColor(sf::Color::Magenta);
+    titul.setPosition(150, 200);
+    sf::Text txt("Press Esc to exit to main menu.", fontArial, 20);
+    txt.setLetterSpacing(2);
+    txt.setFillColor(sf::Color::White);
+    txt.setPosition(250, 300);
+
+    while (window.isOpen())
+    {
+        sf::Event event;
+        while (window.pollEvent(event))
+        {
+            if (event.type == sf::Event::Closed) window.close();
+            if (event.type == sf::Event::KeyPressed)
+            {
+                if (event.key.code == sf::Keyboard::Escape) return;
+            }
+        }
+        window.clear();
+        window.draw(titul);
+        window.draw(txt);
+        window.display();
+    }
+}
+
+void Menu::loseScreen(sf::RenderWindow& window) {
+    sf::Font fontPixel;
+    fontPixel.loadFromFile("fonts/pixel.ttf");
+    sf::Font fontArial;
+    fontArial.loadFromFile("fonts/arial.ttf");
+
+    sf::Text titul("You died.", fontPixel, 80);
+    titul.setLetterSpacing(2);
+    titul.setFillColor(sf::Color::Red);
+    titul.setPosition(150, 200);
+    sf::Text txt("Press Esc to exit to main menu.", fontArial, 20);
+    txt.setLetterSpacing(2);
+    txt.setFillColor(sf::Color::White);
+    txt.setPosition(250, 300);
+
+    while (window.isOpen())
+    {
+        sf::Event event;
+        while (window.pollEvent(event))
+        {
+            if (event.type == sf::Event::Closed) window.close();
+            if (event.type == sf::Event::KeyPressed)
+            {
+                if (event.key.code == sf::Keyboard::Escape) return;
+            }
+        }
+        window.clear();
+        window.draw(titul);
+        window.draw(txt);
+        window.display();
+    }
+}

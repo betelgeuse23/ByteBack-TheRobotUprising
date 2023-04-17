@@ -6,6 +6,7 @@
 #include "Entity.h"
 #include "Maps.h"
 #include "menu.h"
+#include <fstream>
 
 class Game {
 public:
@@ -13,5 +14,5 @@ public:
 	int getLevel() { return level; }
 	void setLevel(int lvl) { level = lvl; }
 private:
-	int level;
+	int level = 1;
 };
