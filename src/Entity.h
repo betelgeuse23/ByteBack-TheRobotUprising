@@ -23,49 +23,56 @@ class Bonus;
 class Bullet;
 
 struct Level {
-    int* map = nullptr;
     sf::Vector2i size;
     sf::Vector2i base;
-    std::vector<Bullet*> bullets;
     std::vector<Enemy*> enemies;
     std::vector<Bonus*> bonuses;
-    Player* player = nullptr;
+    std::vector<Bullet*> bullets;
+    std::vector<Player*> players;
+    std::vector<std::vector<int>> map;
+    void clear() {
+        for (auto i : enemies) delete i;
+        for (auto i : bonuses) delete i;
+        for (auto i : bullets) delete i;
+        for (auto i : players) delete i;
+    }
+    void translate(int* mapT) {
+        map = std::vector<std::vector<int>>(size.x, std::vector<int>(size.y));
+        for (int i = 0, t = 0; i < size.x; i++) for (int j = 0; j < size.y; j++) map[j][i] = mapT[t++];
+    }
 };
 
 class PathFinder {
 public:
-    PathFinder() = default;
-    PathFinder(Level*, Entity*, std::map<int, int>);
-    Direction pathfind(sf::Vector2i);
-    
-    void info();
-    bool isInit() { return init; };
-    bool isAccesible(const Direction, const sf::Vector2i);
-    bool doTrace(const Direction, const sf::Vector2i, int);
+    PathFinder(Level* level, std::map<int, int> costs)
+        : level(level), accesible(std::vector<std::vector<int>>(level->size.x, std::vector<int>(level->size.y))), costs(costs) {};
 
+    Direction pathfind(sf::Vector2i, sf::Vector2i);
+    bool isAccesible(const Direction, const sf::Vector2i);
+    bool doTrace(const Direction, const sf::Vector2i, int, bool);
+
+    void info();
     Level* getLevel() { return level; };
-    std::vector<std::vector<int>>* getAcceses() { return &accesible; };
 private:
     Level* level;
-    Entity* that;
     std::map<int, int> costs;
     std::vector<std::vector<int>> accesible;
-    bool init = false;
 
-    void makeCosts(bool);
+    void makeCosts(sf::Vector2i, bool);
 };
 
 class Entity {
 public:
     Entity(std::string, sf::Vector2i);
     inline void draw(sf::RenderWindow& window) { window.draw(sprite); };
-    void initPatfind(Level*, std::map<int, int>);
+    void initPatfind(PathFinder* pf) { this->pf = pf; };
     void initAnimation(std::map<State, int> a) { animations = a; };
 
     void move(sf::Vector2i);
     void move(Direction);
     void update();
 
+    sf::Vector2f getSpritePosition() { return sprite.getPosition(); };
     sf::Vector2i getPosition() { return position; };
     Direction getDirection() { return direction; };
     State getState() { return state; };
@@ -74,7 +81,7 @@ public:
     void setState(State state) { this->state = state; };
     void setPosition(sf::Vector2i position);
 protected:
-    PathFinder pf;
+    PathFinder* pf = nullptr;
     sf::Clock clock;
     sf::Sprite sprite;
     sf::Texture texture;
@@ -101,7 +108,7 @@ public:
 class Enemy : public Entity {
 public:
     Enemy(std::string str, sf::Vector2i pos) : Entity(str, pos) { animations = { {Moving, 4} }; };
-    void makeTarget() { target = pf.getLevel()->base; }
+    void makeTarget() { target = pf->getLevel()->base; }
     void initStats(int, int, float);
     bool doDamage(int);
     void shoot(Level*, Direction);

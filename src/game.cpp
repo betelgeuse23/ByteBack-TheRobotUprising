@@ -30,16 +30,24 @@ void Game::startGame(sf::RenderWindow& window, sf::Clock& clock, Menu& menu) {
 
     Level level1;
     level1.size = sf::Vector2i(21, 21);
-    level1.map = level;
+    level1.translate(level);
     level1.base = sf::Vector2i(10, 19);
-    level1.player = new Player("images/character.png", sf::Vector2i(10, 10));
-    level1.player->initPatfind(&level1, { {0,1}, {3,1}, {6,1} });
+
+    PathFinder pfE(&level1, { {0,1}, {6, 1}, {1, 2}, {2, 3}, {4, 1} });
+    PathFinder pfP(&level1, { {0,1}, {3,1}, {6,1} });
+
+    level1.players.push_back(new Player("images/character.png", sf::Vector2i(10, 10)));
     level1.enemies.push_back(new Enemy("images/robot2.png", sf::Vector2i(1, 1)));
     level1.enemies.push_back(new Enemy("images/robot2.png", sf::Vector2i(1, 2)));
     level1.enemies.push_back(new Enemy("images/robot2.png", sf::Vector2i(1, 3)));
+
     for (auto& e : level1.enemies) {
-        e->initPatfind(&level1, { {0,1}, {6, 1}, {1, 2}, {2, 3}, {4, 1} });
+        e->initPatfind(&pfE);
         e->makeTarget();
+    }
+
+    for (auto& p : level1.players) {
+        p->initPatfind(&pfP);
     }
 
 
@@ -64,19 +72,19 @@ void Game::startGame(sf::RenderWindow& window, sf::Clock& clock, Menu& menu) {
 
         // обработка нажатий клавиш
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
-            level1.player->move(Left);
+            level1.players[0]->move(Left);
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
-            level1.player->move(Right);
+            level1.players[0]->move(Right);
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
-            level1.player->move(Up);
+            level1.players[0]->move(Up);
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
-            level1.player->move(Down);
+            level1.players[0]->move(Down);
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
-            level1.player->shoot(&level1);
+            level1.players[0]->shoot(&level1);
         }
 
         window.clear(sf::Color::Black);
@@ -87,9 +95,7 @@ void Game::startGame(sf::RenderWindow& window, sf::Clock& clock, Menu& menu) {
             if (e->getState() != Dead) {
                 e->update();
                 e->draw(window);
-                if (e->getPosition() == level1.base) {
-                    level1.player->doDamage(5);
-                }
+                if (e->getPosition() == level1.base) { level1.players[0]->doDamage(5); e->setState(State::Dead); }
             }
             else {
                 delete e;
@@ -97,14 +103,16 @@ void Game::startGame(sf::RenderWindow& window, sf::Clock& clock, Menu& menu) {
             }
         }
 
-        level1.player->update();
-        level1.player->draw(window);
+        for (auto& p : level1.players) {
+            p->update();
+            p->draw(window);
+        }
 
         for (auto& bullet : level1.bullets) {
             bullet->update(time);
             if (bullet->checkCollisions(&level1)) {
                 level1.bullets.erase(std::find(level1.bullets.begin(), level1.bullets.end(), bullet));
-                map.load("images/tileset.png", sf::Vector2u(32, 32), level, WIDTH, WIDTH);
+                map.load("images/tileset.png", sf::Vector2u(cell, cell), level1.map, WIDTH, WIDTH);
             }
             else {
                 bulletSprite.setPosition(bullet->getPosition());
@@ -112,12 +120,12 @@ void Game::startGame(sf::RenderWindow& window, sf::Clock& clock, Menu& menu) {
             }
         }
 
-        for (int i = 0; i < level1.player->getLives(); i++)
+        for (int i = 0; i < level1.players[0]->getLives(); i++)
         {
             heartSprite.setPosition(620 + (i + 1) * 32, 20);
             window.draw(heartSprite);
         }
-        if (level1.player->getLives() == 0 || level1.enemies.empty()) return;
+        if (level1.players[0]->getLives() == 0 || level1.enemies.empty()) return;
 
         window.display();
     }
