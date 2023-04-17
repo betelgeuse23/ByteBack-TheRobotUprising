@@ -14,8 +14,8 @@ FILE(COPY "${CMAKE_CURRENT_SOURCE_DIR}/fonts" DESTINATION "${CMAKE_CURRENT_BINAR
 add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${HEADER_FILES})
 set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
 
-find_package(SFML REQUIRED graphics window)
-target_link_libraries(${PROJECT_NAME} sfml-graphics sfml-window)
+find_package(SFML REQUIRED graphics window audio)
+target_link_libraries(${PROJECT_NAME} sfml-graphics sfml-window sfml-audio)
 
 if ( MSVC )
     string(REPLACE "/MD" "/MT" CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
