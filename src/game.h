@@ -13,5 +13,5 @@ public:
 	int getLevel() { return level; }
 	void setLevel(int lvl) { level = lvl; }
 private:
-	int level = 1;
+	int level;
 };

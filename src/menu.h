@@ -9,7 +9,7 @@ public:
 	sf::Font font;
 	sf::Color menu_text_color = sf::Color::White;
 	sf::Color main_text_color = sf::Color::Yellow;
-	Menu(sf::RenderWindow& window, sf::String name[]);
+	Menu(sf::RenderWindow& window, sf::String name[], int itm);
 	~Menu()
 	{
 		delete[] mainMenu;
@@ -26,6 +26,7 @@ public:
 
 private:
 	int mainMenuSelected;
+	int items;
 	sf::Text* mainMenu;
 	sf::RenderWindow& menuWindow;
 };

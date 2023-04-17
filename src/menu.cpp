@@ -1,11 +1,11 @@
 #include "menu.h"
 
-Menu::Menu(sf::RenderWindow& window, sf::String name[])
-	:menuWindow(window)
+Menu::Menu(sf::RenderWindow& window, sf::String name[], int itm)
+	:menuWindow(window), items(itm)
 {  
 	font.loadFromFile("fonts/arial.ttf");
-	mainMenu = new sf::Text[5];
-    for (int i = 0, ypos = 192; i < 5; i++, ypos += 64)
+	mainMenu = new sf::Text[items];
+    for (int i = 0, ypos = 192; i < items; i++, ypos += 64)
         if (i == 0) setInitText(mainMenu[i], name[i], 96, ypos, 1);
         else setInitText(mainMenu[i], name[i], 96, ypos, 0);
 	mainMenuSelected = 0; 
@@ -24,7 +24,7 @@ void Menu::setInitText(sf::Text& text, sf::String str, float xpos, float ypos, b
 
 void Menu::draw()
 { 	
-	for (int i = 0; i < 5; i++) menuWindow.draw(mainMenu[i]);
+	for (int i = 0; i < items; i++) menuWindow.draw(mainMenu[i]);
 }
 
 int Menu::getSelectedMenuNumber()
@@ -37,7 +37,7 @@ int Menu::MoveUp()
     mainMenu[mainMenuSelected].setFillColor(menu_text_color);
 	mainMenuSelected--;
 	if (mainMenuSelected == -1) {
-		mainMenuSelected = 4;
+		mainMenuSelected = items - 1;
 	}
     mainMenu[mainMenuSelected].setFillColor(main_text_color);
 	return mainMenuSelected;
@@ -47,7 +47,7 @@ int Menu::MoveDown()
 {
     mainMenu[mainMenuSelected].setFillColor(menu_text_color);
 	mainMenuSelected++;
-	if (mainMenuSelected == 5) {
+	if (mainMenuSelected == items) {
 		mainMenuSelected = 0;
 	}
     mainMenu[mainMenuSelected].setFillColor(main_text_color);

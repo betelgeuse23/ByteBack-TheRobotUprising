@@ -24,7 +24,7 @@ void Game::startGame(sf::RenderWindow& window, sf::Clock& clock, Menu& menu) {
     healthText.setFillColor(sf::Color::White);
     healthText.setPosition(680, 10);
 
-    int* level = Map::getMap(1);
+    int* level = Map::getMap(10);
     TileMap map;
     map.load("images/tileset.png", sf::Vector2u(32, 32), level, WIDTH, WIDTH);
 
