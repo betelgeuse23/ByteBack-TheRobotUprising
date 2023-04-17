@@ -8,30 +8,31 @@ int main() {
     float delay = 0;
     int gameLevel = 0;
 
-    TileMap menuMap;
-    int map[729] = { 0 };
-    menuMap.load("images/tileset.png", sf::Vector2u(32, 32), map, WIDTH + 6, WIDTH);
-
     // текст
     sf::Font fontPixel;
     fontPixel.loadFromFile("fonts/pixel.ttf");
     sf::Font fontArial;
     fontArial.loadFromFile("fonts/arial.ttf");
 
-    sf::Text titulFirst("Byte Back:", fontPixel, 70);
+    sf::Text titulFirst("Byte Back:", fontPixel, 80);
     titulFirst.setLetterSpacing(2);
     titulFirst.setFillColor(sf::Color::White);
-    titulFirst.setPosition(20, 23);
+    titulFirst.setPosition(27, 44);
     sf::Text titulSecond("the robot uprising", fontArial, 30);
     titulSecond.setLetterSpacing(2);
     titulSecond.setFillColor(sf::Color::White);
-    titulSecond.setPosition(416, 96);
+    titulSecond.setPosition(420, 128);
     sf::Text point(">", fontPixel, 35);
     point.setFillColor(sf::Color::White);
 
+    sf::Texture menuTexture;
+    menuTexture.loadFromFile("images/menu.png");
+    sf::Sprite menuSprite;
+    menuSprite.setTexture(menuTexture);
 
     sf::String name_menu[]{ L"START", L"CONTINUE", L"OPTIONS", L"TUTORIAL", L"QUIT" };
     Menu menu(window, name_menu);
+    Game game;
 
     while (window.isOpen()) {
         sf::Event event;
@@ -60,7 +61,7 @@ int main() {
             {
                 switch (menu.getSelectedMenuNumber())
                 {
-                case 0:menu.startGame(window, clock);   break;
+                case 0:game.startGame(window, clock, menu);   break;
                 case 2:menu.Options(window);  break;
                 case 3:menu.Tutorial(window); break;
                 //case 2:;  break;
@@ -70,7 +71,7 @@ int main() {
             }
         }
         window.clear(sf::Color::Black);
-        window.draw(menuMap);
+        window.draw(menuSprite);
         window.draw(titulFirst);
         window.draw(titulSecond);
         menu.draw();
