@@ -242,15 +242,16 @@ bool Enemy::doDamage(int d) {
 	return state != Dead;
 }
 
-void Enemy::initStats(int h, int r, float s) {
+void Enemy::initStats(int h, int r, int d, float s) {
 	health = h;
 	range = r;
+	damage = d;
 	speed = s;
 }
 
 void Enemy::shoot(Level* level, Direction dir) {
 	if (isCharged()) {
-		level->bullets.push_back(new Bullet(position, dir, 1, false));
+		level->bullets.push_back(new Bullet(position, dir, damage, false));
 	}
 }
 
@@ -316,4 +317,100 @@ void Player::shoot(Level* level) {
 	if (isCharged()) {
 		level->bullets.push_back(new Bullet(sprite.getPosition(), lastDirection, damage, true));
 	}
+}
+
+
+void Spawner::spawn(int* map) {
+	sf::Vector2i size = level->size;
+	for (int i = 0, t = 0; i < size.x; i++) for (int j = 0; j < size.y; j++, t++) {
+		switch (map[t]) {
+		case 11:
+			spawnRobot1(sf::Vector2i(j, i));
+			break;
+		case 12:
+			spawnRobot2(sf::Vector2i(j, i));
+			break;
+		case 13:
+			spawnRobot3(sf::Vector2i(j, i));
+			break;
+		case 14:
+			spawnRobot4(sf::Vector2i(j, i));
+			break;
+		case 15:
+			spawnRobot5(sf::Vector2i(j, i));
+			break;
+		case 20:
+			spawnPlayer(0,sf::Vector2i(j, i));
+			break;
+		}
+	}
+}
+
+void Spawner::spawnPlayer(int col, sf::Vector2i pos) {
+	std::string str;
+	switch (col) {
+	case 1:
+		str = "images/character1.png";
+		break;
+	case 2:
+		str = "images/character2.png";
+		break;
+	case 3:
+		str = "images/character3.png";
+		break;
+	case 4:
+		str = "images/character4.png";
+		break;
+	default:
+		str = "images/character.png";
+		break;
+	}
+	Player* pl = new Player(str, pos);
+	pl->initPatfind(&pfP);
+	level->players.push_back(pl);
+}
+
+void Spawner::spawnRobot1(sf::Vector2i pos) {
+	Enemy* en = new Enemy("images/robot1.png", pos);
+	en->initPatfind(&pfE);
+	en->makeTarget();
+	en->initAnimation({ {Moving, 1} });
+	en->initStats(1, 15, 1, (float)0.2);
+	level->enemies.push_back(en);
+}
+
+void Spawner::spawnRobot2(sf::Vector2i pos) {
+	Enemy* en = new Enemy("images/robot2.png", pos);
+	en->initPatfind(&pfE);
+	en->makeTarget();
+	en->initAnimation({ {Moving, 4} });
+	en->initStats(2, 10, 1, (float)0.1);
+	level->enemies.push_back(en);
+}
+
+void Spawner::spawnRobot3(sf::Vector2i pos) {
+	Enemy* en = new Enemy("images/robot3.png", pos);
+	en->initPatfind(&pfE);
+	en->makeTarget();
+	en->initAnimation({ {Moving, 1} });
+	en->initStats(2, 5, 3, (float)0.05);
+	level->enemies.push_back(en);
+}
+
+void Spawner::spawnRobot4(sf::Vector2i pos) {
+	Enemy* en = new Enemy("images/robot4.png", pos);
+	en->initPatfind(&pfE);
+	en->makeTarget();
+	en->initAnimation({ {Moving, 1} });
+	en->initStats(1, 7, 2, (float)0.15);
+	level->enemies.push_back(en);
+}
+
+void Spawner::spawnRobot5(sf::Vector2i pos) {
+	Enemy* en = new Enemy("images/robot5.png", pos);
+	en->initPatfind(&pfE);
+	en->makeTarget();
+	en->initAnimation({ {Moving, 1} });
+	en->initStats(2, 20, 1, (float)0.1);
+	level->enemies.push_back(en);
 }

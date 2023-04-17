@@ -61,7 +61,7 @@ int main() {
             {
                 switch (menu.getSelectedMenuNumber())
                 {
-                case 0:game.setLevel(10);  game.startGame(window, clock, menu);   break;
+                case 0:game.setLevel(1);  game.startGame(window, clock, menu);   break;
                 case 1: {
                     std::ifstream file("save.txt");
                     std::string lvl;

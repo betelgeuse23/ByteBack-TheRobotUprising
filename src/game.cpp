@@ -33,37 +33,12 @@ void Game::startGame(sf::RenderWindow& window, sf::Clock& clock, Menu& menu) {
 
     int* lvl = Map::getMap(level);
     TileMap map;
-    map.load("images/tileset.png", sf::Vector2u(32, 32), lvl, WIDTH, WIDTH);
 
     Level level1;
-    level1.size = sf::Vector2i(21, 21);
+    level1.size = sf::Vector2i(WIDTH, WIDTH);
     level1.translate(lvl);
-    level1.base = sf::Vector2i(10, 20);
-
-    PathFinder pfE(&level1, { {0,1}, {6, 1}, {1, 2}, {2, 3}, {3, 1} });
-    PathFinder pfP(&level1, { {0,1}, {4,1}, {6,1} });
-
-    level1.players.push_back(new Player("images/character.png", sf::Vector2i(10, 10)));
-    level1.enemies.push_back(new Enemy("images/robot2.png", sf::Vector2i(2, 2)));
-    /*level1.enemies.push_back(new Enemy("images/robot2.png", sf::Vector2i(2, 3)));
-    level1.enemies.push_back(new Enemy("images/robot2.png", sf::Vector2i(3, 2)));*/
-    level1.enemies.push_back(new Enemy("images/robot2.png", sf::Vector2i(3, 3)));
-    level1.bonuses.push_back(new Bonus(Health, sf::Vector2i(7, 5)));
-    level1.bonuses.push_back(new Bonus(Speed, sf::Vector2i(8, 5)));
-    level1.bonuses.push_back(new Bonus(Rate, sf::Vector2i(9, 5)));
-    level1.bonuses.push_back(new Bonus(Shield, sf::Vector2i(10, 5)));
-    level1.bonuses.push_back(new Bonus(Damage, sf::Vector2i(11, 5)));
-    level1.bonuses.push_back(new Bonus(Spare, sf::Vector2i(12, 5)));
-
-    for (auto& e : level1.enemies) {
-        e->initPatfind(&pfE);
-        e->makeTarget();
-    }
-
-    for (auto& p : level1.players) {
-        p->initPatfind(&pfP);
-    }
-
+    Spawner sp(&level1);
+    sp.spawn(lvl);
 
     // работа с окном
     while (window.isOpen())
@@ -129,7 +104,7 @@ void Game::startGame(sf::RenderWindow& window, sf::Clock& clock, Menu& menu) {
         for (auto& p : level1.players) {
             p->update();
             p->draw(window);
-            if (p->isShielded()) {
+            if (p->getEffect() == Shield) {
                 shieldSprite.setPosition(p->getSpritePosition());
                 shieldSprite.setTextureRect(sf::IntRect(32*(std::rand()%4), 0, 31, 31));
                 window.draw(shieldSprite);
