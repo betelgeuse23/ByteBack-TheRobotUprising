@@ -24,13 +24,13 @@ void Game::startGame(sf::RenderWindow& window, sf::Clock& clock, Menu& menu) {
     healthText.setFillColor(sf::Color::White);
     healthText.setPosition(680, 10);
 
-    int* level = Map::getMap(10);
+    int* lvl = Map::getMap(level);
     TileMap map;
-    map.load("images/tileset.png", sf::Vector2u(32, 32), level, WIDTH, WIDTH);
+    map.load("images/tileset.png", sf::Vector2u(32, 32), lvl, WIDTH, WIDTH);
 
     Level level1;
     level1.size = sf::Vector2i(21, 21);
-    level1.translate(level);
+    level1.translate(lvl);
     level1.base = sf::Vector2i(10, 19);
 
     PathFinder pfE(&level1, { {0,1}, {6, 1}, {1, 2}, {2, 3}, {4, 1} });
@@ -38,8 +38,8 @@ void Game::startGame(sf::RenderWindow& window, sf::Clock& clock, Menu& menu) {
 
     level1.players.push_back(new Player("images/character.png", sf::Vector2i(10, 10)));
     level1.enemies.push_back(new Enemy("images/robot2.png", sf::Vector2i(1, 1)));
-    level1.enemies.push_back(new Enemy("images/robot2.png", sf::Vector2i(1, 2)));
-    level1.enemies.push_back(new Enemy("images/robot2.png", sf::Vector2i(1, 3)));
+    //level1.enemies.push_back(new Enemy("images/robot2.png", sf::Vector2i(1, 2)));
+    //level1.enemies.push_back(new Enemy("images/robot2.png", sf::Vector2i(1, 3)));
 
     for (auto& e : level1.enemies) {
         e->initPatfind(&pfE);
@@ -125,7 +125,26 @@ void Game::startGame(sf::RenderWindow& window, sf::Clock& clock, Menu& menu) {
             heartSprite.setPosition(620 + (i + 1) * 32, 20);
             window.draw(heartSprite);
         }
-        if (level1.players[0]->getLives() == 0 || level1.enemies.empty()) return;
+        if (level1.players[0]->getLives() == 0) {
+            menu.loseScreen(window);
+            return;
+        }
+        if (level1.enemies.empty()) {
+            if (level == 10) {
+                level = 1;
+                menu.winScreen(window);
+                return;
+            }
+            else {
+                level++;
+                std::fstream file("save.txt", std::ios::in | std::ios::out);
+                file.seekp(0);
+                file << std::to_string(level) << std::endl;
+                Game game;
+                game.setLevel(level);
+                game.startGame(window, clock, menu);
+            }
+        }
 
         window.display();
     }
