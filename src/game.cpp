@@ -109,12 +109,12 @@ void Game::startGame(sf::RenderWindow& window, sf::Clock& clock, Menu& menu) {
         }
 
         for (auto& bullet : level1.bullets) {
-            bullet->update(time);
             if (bullet->checkCollisions(&level1)) {
                 level1.bullets.erase(std::find(level1.bullets.begin(), level1.bullets.end(), bullet));
                 map.load("images/tileset.png", sf::Vector2u(cell, cell), level1.map, WIDTH, WIDTH);
             }
             else {
+                bullet->update(time);
                 bulletSprite.setPosition(bullet->getPosition());
                 window.draw(bulletSprite);
             }

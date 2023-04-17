@@ -239,11 +239,11 @@ void Enemy::update() {
 	Direction dir = pf->pathfind(position, target);
 	if (state == Moving) move();
 	if (state != Moving) {
-		if (direction != None && pf->doTrace(direction, this->position, 10, true)) { shoot(pf->getLevel(), direction); }
-		else if (direction != Up && pf->doTrace(Up, this->position, 10, false)) { shoot(pf->getLevel(), Up); }
+		if (direction != Up && pf->doTrace(Up, this->position, 10, false)) { shoot(pf->getLevel(), Up); }
 		else if (direction != Down && pf->doTrace(Down, this->position, 10, false)) { shoot(pf->getLevel(), Down); }
 		else if (direction != Left && pf->doTrace(Left, this->position, 10, false)) { shoot(pf->getLevel(), Left); }
 		else if (direction != Right && pf->doTrace(Right, this->position, 10, false)) { shoot(pf->getLevel(), Right); }
+		else if (direction != None && pf->doTrace(direction, this->position, 10, true)) { shoot(pf->getLevel(), direction); }
 	}
 	move(dir);
 }
