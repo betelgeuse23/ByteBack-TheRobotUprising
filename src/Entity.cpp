@@ -8,10 +8,6 @@ Entity::Entity(std::string texture, sf::Vector2i position) {
 	this->sprite.setPosition(sf::Vector2f(position * cell));
 }
 
-void Entity::initPatfind(Level* level, std::map<int, int> costs) {
-	pf = PathFinder(level, this, costs);
-}
-
 void Entity::update() {
 	if (state == Moving) move();
 }
@@ -29,9 +25,9 @@ void Entity::animate(State st, int fr) {
 }
 
 void Entity::move(sf::Vector2i dest) {
-	if (pf.isInit() && state == Still) {
+	if (pf && state == Still) {
 		clock.restart();
-		direction = pf.pathfind(dest);
+		direction = pf->pathfind(position, dest);
 		state = Moving;
 	}
 	if (direction) lastDirection = direction;
@@ -47,7 +43,7 @@ void Entity::move(Direction dir) {
 }
 
 void Entity::move() {
-	if(direction && (!(pf.isInit()) || (pf.isInit() && pf.isAccesible(direction, position)))) {
+	if(direction && (!(pf) || (pf && pf->isAccesible(direction, position)))) {
 		sf::Vector2i t_pos = position * cell;
 		int time = clock.getElapsedTime().asMilliseconds();
 		int change = std::min(int(time * speed), cell);
@@ -72,16 +68,11 @@ void Entity::move() {
 
 
 
-PathFinder::PathFinder(Level* level, Entity* that, std::map<int, int> costs)
-	: level(level), that(that), accesible(std::vector<std::vector<int>>(level->size.x, std::vector<int>(level->size.y))), costs(costs), init(true) {
-	makeCosts(false);
-}
+Direction PathFinder::pathfind(sf::Vector2i pos, sf::Vector2i dest) {
+	sf::Vector2i size = level->size;
+	if(dest.x < 0 || dest.y < 0 || dest.x >= size.x || dest.y >= size.y || pos.x < 0 || pos.y < 0 || pos.x >= size.x || pos.y >= size.y) return Direction::None;
 
-Direction PathFinder::pathfind(sf::Vector2i dest) {
-	sf::Vector2i pos = that->getPosition(), size = level->size;
-	if(!(init) || dest.x < 0 || dest.y < 0 || dest.x >= size.x || dest.y >= size.y || pos.x < 0 || pos.y < 0 || pos.x >= size.x || pos.y >= size.y) return Direction::None;
-
-	makeCosts(true);
+	makeCosts(pos, true);
 	
 	struct Node {
 		sf::Vector2i v;
@@ -139,41 +130,49 @@ Direction PathFinder::pathfind(sf::Vector2i dest) {
 	return Direction::None;
 }
 
-void PathFinder::info() {
-	if (accesible.empty()) std::cout << "Empty" << std::endl;
-	else Utils::vecCout(level->size, accesible);
-}
-
 bool PathFinder::isAccesible(const Direction dir, const sf::Vector2i pos) {
-	makeCosts(false);
+	makeCosts(pos, false);
 	sf::Vector2i posN = pos + Utils::makeDir(dir);
 
-	if (!(init) || posN.x < 0 || posN.y < 0 || posN.x >= level->size.x || posN.y >= level->size.y || !(accesible[posN.x][posN.y])) return false;
+	if (posN.x < 0 || posN.y < 0 || posN.x >= level->size.x || posN.y >= level->size.y || !(accesible[posN.x][posN.y])) return false;
 	return true;
 }
 
-bool PathFinder::doTrace(Direction dir, const sf::Vector2i pos, int range) {
+bool PathFinder::doTrace(Direction dir, const sf::Vector2i pos, int range, bool prime) {
 	sf::Vector2i act_pos = pos;
 	int r = 0;
 	while (isAccesible(dir, act_pos) && range > r++) { act_pos += Utils::makeDir(dir); }
 	act_pos += Utils::makeDir(dir);
 	if (act_pos.x < 0 || act_pos.y < 0 || act_pos.x >= level->size.x || act_pos.y >= level->size.y) act_pos -= Utils::makeDir(dir);
-	makeCosts(true);
+	makeCosts(pos, true);
 	int ac = accesible[act_pos.x][act_pos.y];
-	if (ac == 20 || ac == 2 || ac == 3) return true;
+	if (ac == 20 || ac == 25) return true;
+	if (prime && (ac == 2 || ac == 3 || ac == 7 || ac == 8)) return true;
 	return false;
 }
 
-void PathFinder::makeCosts(bool search) {
-	for (int i = 0, t = 0; i < level->size.x; i++) for (int j = 0; j < level->size.y; j++) accesible[j][i] = search?costs[level->map[t++]]:(costs[level->map[t++]]!= 1?0:1);
+void PathFinder::makeCosts(sf::Vector2i currPos, bool search) {
+	for (int i = 0; i < level->size.x; i++) for (int j = 0; j < level->size.y; j++) accesible[j][i] = search?costs[level->map[j][i]]:(costs[level->map[j][i]]!= 1?0:1);
 	if (!level->enemies.empty()) {
 		for (auto& e : level->enemies) {
-			if (e == that) continue;
-			sf::Vector2i pos = e->getPosition(), size = level->size;
+			sf::Vector2i pos = e->getPosition();
+			if (pos == currPos) continue;
+			sf::Vector2i size = level->size;
 			Direction dir = e->getDirection();
 			if (pos.y >= 0 && pos.y < size.y && pos.x >= 0 && pos.x < size.x) accesible[pos.x][pos.y] = search ? 10 : 0;
 			pos += Utils::makeDir(dir);
 			if(pos.y >= 0 && pos.y < size.y && pos.x >= 0 && pos.x < size.x) accesible[pos.x][pos.y] += search ? 5 : 0;
+		}
+	}
+	if (!level->players.empty()) {
+		for (auto& p : level->players) {
+			sf::Vector2i pos = p->getPosition();
+			if (pos == currPos) continue;
+			sf::Vector2i size = level->size;
+			Direction dir = p->getDirection();
+			if (pos.y >= 0 && pos.y < size.y && pos.x >= 0 && pos.x < size.x) accesible[pos.x][pos.y] = search ? 20 : 0;
+			pos += Utils::makeDir(dir);
+			if (pos.y >= 0 && pos.y < size.y && pos.x >= 0 && pos.x < size.x) accesible[pos.x][pos.y] += search ? 5 : 0;
 		}
 	}
 	if (search && !level->bullets.empty()) {
@@ -182,13 +181,7 @@ void PathFinder::makeCosts(bool search) {
 			accesible[pos.x][pos.y] = 100;
 		}
 	}
-	if (level->player) {
-		sf::Vector2i pos = level->player->getPosition(), size = level->size;
-		Direction dir = level->player->getDirection();
-		if (pos.y >= 0 && pos.y < size.y && pos.x >= 0 && pos.x < size.x) accesible[pos.x][pos.y] = search ? 20 : 0;
-		pos += Utils::makeDir(dir);
-		if (pos.y >= 0 && pos.y < size.y && pos.x >= 0 && pos.x < size.x) accesible[pos.x][pos.y] += search ? 5 : 0;
-	}
+
 }
 
 
@@ -204,7 +197,7 @@ sf::Vector2i Utils::makeDir(Direction dir) {
 }
 
 sf::Vector2i Utils::gPos(sf::Vector2f pos) {
-	return sf::Vector2i((int)(pos.x / cell), (int)(pos.y / cell));
+	return sf::Vector2i((int)((pos.x + (int)(cell/2)) / cell), (int)((pos.y + (int)(cell / 2)) / cell));
 }
 
 void Utils::vecCout(sf::Vector2i size, std::vector<std::vector<int>> vec) {
@@ -233,7 +226,7 @@ void Enemy::initStats(int h, int r, float s) {
 
 void Enemy::shoot(Level* level, Direction dir) {
 	if (isCharged()) {
-		level->bullets.push_back(new Bullet(position + Utils::makeDir(dir), dir, 1));
+		level->bullets.push_back(new Bullet(position, dir, 1, false));
 	}
 }
 
@@ -243,18 +236,22 @@ bool Enemy::isCharged() {
 };
 
 void Enemy::update() {
-	Direction dir = pf.pathfind(pf.getLevel()->base);
-	move(dir);
-	if (pf.doTrace(dir, this->position, 10)) { shoot(pf.getLevel(), direction); }
-	else if (pf.doTrace(Up, this->position, 10)) { shoot(pf.getLevel(), Up); }
-	else if (pf.doTrace(Down, this->position, 10)) { shoot(pf.getLevel(), Down); }
-	else if (pf.doTrace(Left, this->position, 10)) { shoot(pf.getLevel(), Left); }
-	else if (pf.doTrace(Right, this->position, 10)) { shoot(pf.getLevel(), Right); }
+	Direction dir = pf->pathfind(position, target);
 	if (state == Moving) move();
+	if (state != Moving) {
+		if (direction != None && pf->doTrace(direction, this->position, 10, true)) { shoot(pf->getLevel(), direction); }
+		else if (direction != Up && pf->doTrace(Up, this->position, 10, false)) { shoot(pf->getLevel(), Up); }
+		else if (direction != Down && pf->doTrace(Down, this->position, 10, false)) { shoot(pf->getLevel(), Down); }
+		else if (direction != Left && pf->doTrace(Left, this->position, 10, false)) { shoot(pf->getLevel(), Left); }
+		else if (direction != Right && pf->doTrace(Right, this->position, 10, false)) { shoot(pf->getLevel(), Right); }
+	}
+	move(dir);
 }
 
-bool Player::doDamage() {
-	lives = std::max(0, lives - 1);
+
+
+bool Player::doDamage(int dmg) {
+	lives = std::max(0, lives - dmg);
 	setPosition(spawn);
 	if (lives == 0) state = Dead;
 	return state != Dead;
@@ -281,5 +278,16 @@ void Player::update() {
 	if ((damage > 1 || speed > 0.2) && clock.getElapsedTime().asSeconds() > 2) {
 		damage = 1;
 		speed = 0.2;
+	}
+}
+
+bool Player::isCharged() {
+	if (fire.getElapsedTime().asSeconds() > 1) { fire.restart(); return true; }
+	else return false;
+};
+
+void Player::shoot(Level* level) {
+	if (isCharged()) {
+		level->bullets.push_back(new Bullet(sprite.getPosition(), lastDirection, damage, true));
 	}
 }
