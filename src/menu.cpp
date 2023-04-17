@@ -5,14 +5,17 @@ Menu::Menu(sf::RenderWindow& window, sf::String name[])
 {  
 	font.loadFromFile("fonts/arial.ttf");
 	mainMenu = new sf::Text[5];
-	for (int i = 0, ypos = 192; i < 5; i++, ypos += 64) setInitText(mainMenu[i], name[i], 96, ypos);
+    for (int i = 0, ypos = 192; i < 5; i++, ypos += 64)
+        if (i == 0) setInitText(mainMenu[i], name[i], 96, ypos, 1);
+        else setInitText(mainMenu[i], name[i], 96, ypos, 0);
 	mainMenuSelected = 0; 
 }
 
-void Menu::setInitText(sf::Text& text, sf::String str, float xpos, float ypos)
+void Menu::setInitText(sf::Text& text, sf::String str, float xpos, float ypos, bool first)
 {
 	text.setFont(font);
-	text.setFillColor(menu_text_color);
+    if (first) text.setFillColor(main_text_color);
+    else text.setFillColor(menu_text_color);
 	text.setString(str);                
 	text.setCharacterSize(30);
 	text.setLetterSpacing(2);
@@ -31,19 +34,23 @@ int Menu::getSelectedMenuNumber()
 
 int Menu::MoveUp()
 {
+    mainMenu[mainMenuSelected].setFillColor(menu_text_color);
 	mainMenuSelected--;
 	if (mainMenuSelected == -1) {
 		mainMenuSelected = 4;
 	}
+    mainMenu[mainMenuSelected].setFillColor(main_text_color);
 	return mainMenuSelected;
 }
 
 int Menu::MoveDown()
 {
+    mainMenu[mainMenuSelected].setFillColor(menu_text_color);
 	mainMenuSelected++;
 	if (mainMenuSelected == 5) {
 		mainMenuSelected = 0;
 	}
+    mainMenu[mainMenuSelected].setFillColor(main_text_color);
 	return mainMenuSelected;
 }
 

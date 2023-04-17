@@ -8,12 +8,13 @@ class Menu
 public:
 	sf::Font font;
 	sf::Color menu_text_color = sf::Color::White;
+	sf::Color main_text_color = sf::Color::Yellow;
 	Menu(sf::RenderWindow& window, sf::String name[]);
 	~Menu()
 	{
 		delete[] mainMenu;
 	}
-	void setInitText(sf::Text& text, sf::String str, float xpos, float ypos);
+	void setInitText(sf::Text& text, sf::String str, float xpos, float ypos, bool first);
 	void draw();   
 	int MoveUp();
 	int MoveDown(); 
