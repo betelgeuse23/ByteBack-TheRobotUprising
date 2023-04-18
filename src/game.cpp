@@ -3,7 +3,7 @@
 void Game::startGame(sf::RenderWindow& window, sf::Clock& clock, Menu& menu, Options& opts) {
     std::srand(time(0));
 
-    if (opts.players == 2) opts.cols = sf::Vector2i(0,1);
+    if (opts.players == 2 && opts.cols == sf::Vector2i(0, 0)) menu.ColorChoose(window, opts);
 
     sf::Music music;
     music.openFromFile("sounds/gameSong.wav");
@@ -62,7 +62,10 @@ void Game::startGame(sf::RenderWindow& window, sf::Clock& clock, Menu& menu, Opt
             {
                 // Закрываем окно
                 if (event.key.code == sf::Keyboard::Escape) {
-                    if (menu.savingScreen(window)) return;
+                    if (menu.savingScreen(window)) {
+                        opts.cols = sf::Vector2i(0, 0);
+                        return;
+                    }
                 }
             }
         }
@@ -168,6 +171,7 @@ void Game::startGame(sf::RenderWindow& window, sf::Clock& clock, Menu& menu, Opt
         if (level1.players.empty() || level1.players[0]->getState() == Dead && (opts.players == 1 || (opts.players == 2 && level1.players[1]->getState() == Dead))) {
             level1.pl.playLoose();
             menu.loseScreen(window);
+            opts.cols = sf::Vector2i(0, 0);
             return;
         }
 
@@ -186,6 +190,7 @@ void Game::startGame(sf::RenderWindow& window, sf::Clock& clock, Menu& menu, Opt
                 game.setLevel(level);
                 game.startGame(window, clock, menu, opts);
             }
+            opts.cols = sf::Vector2i(0, 0);
             return;
         }
 

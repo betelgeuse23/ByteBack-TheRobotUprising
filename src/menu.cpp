@@ -54,6 +54,146 @@ int Menu::MoveDown()
 	return mainMenuSelected;
 }
 
+void Menu::ColorChoose(sf::RenderWindow& window, struct Options& opts) {
+    sf::Clock clock;
+    float delay = 0;
+
+    sf::Texture p1T;
+    p1T.loadFromFile("images/player1big.png");
+    sf::Sprite p1S;
+    p1S.setTexture(p1T);
+
+    sf::Texture p2T;
+    p2T.loadFromFile("images/player2big.png");
+    sf::Sprite p2S;
+    p2S.setTexture(p2T);
+
+    sf::Texture p3T;
+    p3T.loadFromFile("images/player3big.png");
+    sf::Sprite p3S;
+    p3S.setTexture(p3T);
+
+    sf::Texture p4T;
+    p4T.loadFromFile("images/player4big.png");
+    sf::Sprite p4S;
+    p4S.setTexture(p4T);
+
+    TileMap menuMap;
+    int map[729] = { 0 };
+    menuMap.load("images/tileset.png", sf::Vector2u(32, 32), map, WIDTH + 6, WIDTH);
+
+    sf::Font fontPixel;
+    fontPixel.loadFromFile("fonts/pixel.ttf");
+    sf::Text titul("      Choose your colour: \n\n   W/S               UP/DOWN", fontPixel, 40);
+    titul.setFillColor(sf::Color::White);
+    titul.setPosition(33, 50);
+
+    sf::String name_lvl[]{ L"0", L"1", L"2", L"3" };
+    Menu menu1(window, name_lvl, 4, 96, 128, 25, 32);
+    Menu menu2(window, name_lvl, 4, 96, 128, 25, 32);
+    menu2.MoveDown();
+    Game game;
+
+    opts.cols = sf::Vector2i(0, 1);
+
+    while (window.isOpen()) {
+        sf::Event event;
+
+        float time = clock.getElapsedTime().asMilliseconds();
+        clock.restart();
+        delay += time;
+
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed) { window.close(); }
+            if (event.type == sf::Event::KeyPressed)
+            {
+                if (event.key.code == sf::Keyboard::Escape) {
+                    return;
+                }
+            }
+            if (event.key.code == sf::Keyboard::Up) {
+                if (delay > 300)
+                {
+                    menu2.MoveUp();
+                    delay = 0;
+                }
+            }
+            if (event.key.code == sf::Keyboard::Down) {
+                if (delay > 300)
+                {
+                    menu2.MoveDown();
+                    delay = 0;
+                }
+            }
+            if (event.key.code == sf::Keyboard::W) {
+                if (delay > 300)
+                {
+                    menu1.MoveUp();
+                    delay = 0;
+                }
+            }
+            if (event.key.code == sf::Keyboard::S) {
+                if (delay > 300)
+                {
+                    menu1.MoveDown();
+                    delay = 0;
+                }
+            }
+            if (event.key.code == sf::Keyboard::Return)
+            {
+                if (delay > 300) {
+                    delay = 0;
+                    opts.cols = sf::Vector2i(menu1.getSelectedMenuNumber(), menu2.getSelectedMenuNumber());
+                    return;
+                }
+            }
+        }
+
+        window.clear(sf::Color::Black);
+        window.draw(menuMap);
+
+        switch (menu1.getSelectedMenuNumber()) {
+        case 0:
+            p1S.setPosition(120, 250);
+            window.draw(p1S);
+            break;
+        case 1:
+            p2S.setPosition(120, 250);
+            window.draw(p2S);
+            break;
+        case 2:
+            p3S.setPosition(120, 250);
+            window.draw(p3S);
+            break;
+        case 3:
+            p4S.setPosition(120, 250);
+            window.draw(p4S);
+            break;
+        }
+        switch (menu2.getSelectedMenuNumber()) {
+        case 0:
+            p1S.setPosition(600, 250);
+            window.draw(p1S);
+            break;
+        case 1:
+            p2S.setPosition(600, 250);
+            window.draw(p2S);
+            break;
+        case 2:
+            p3S.setPosition(600, 250);
+            window.draw(p3S);
+            break;
+        case 3:
+            p4S.setPosition(600, 250);
+            window.draw(p4S);
+            break;
+        }
+
+        window.draw(titul);
+        window.display();
+    }
+}
+
 void Menu::Options(sf::RenderWindow& window, sf::Music& mus, struct Options& opts) {
     sf::Clock clock;
     float delay = 0;
@@ -391,6 +531,12 @@ void Menu::chooseScreen(sf::RenderWindow& window, struct Options& opts) {
     sf::Text titul("Main game:", fontPixel, 40);
     titul.setFillColor(sf::Color::White);
     titul.setPosition(33, 50);
+    sf::Text mult("Toggle multipeer (M)", fontPixel, 25);
+    mult.setFillColor(sf::Color::White);
+    mult.setPosition(33, 607);
+    sf::Text ok("#", fontPixel, 40);
+    ok.setFillColor(sf::Color::White);
+    ok.setPosition(354,603);
 
     sf::String name_lvl[]{ L"lvl 1", L"lvl 2", L"lvl 3", L"lvl 4", L"lvl 5", L"lvl 6", L"lvl 7", L"lvl 8", L"lvl 9", L"lvl 10" };
     Menu menu(window, name_lvl, 10, 96, 128, 25, 32);
@@ -407,7 +553,10 @@ void Menu::chooseScreen(sf::RenderWindow& window, struct Options& opts) {
             if (event.type == sf::Event::Closed) { window.close(); }
             if (event.type == sf::Event::KeyPressed)
             {
-                if (event.key.code == sf::Keyboard::Escape) return;
+                if (event.key.code == sf::Keyboard::Escape) {
+                    opts.players = 1;
+                    return;
+                }
             }
             if (event.key.code == sf::Keyboard::Up) {
                 if (delay > 300)
@@ -420,6 +569,13 @@ void Menu::chooseScreen(sf::RenderWindow& window, struct Options& opts) {
                 if (delay > 300)
                 {
                     menu.MoveDown();
+                    delay = 0;
+                }
+            }
+            if (event.key.code == sf::Keyboard::M) {
+                if (delay > 300)
+                {
+                    opts.players = opts.players==2?1:2;
                     delay = 0;
                 }
             }
@@ -445,6 +601,8 @@ void Menu::chooseScreen(sf::RenderWindow& window, struct Options& opts) {
         window.clear(sf::Color::Black);
         window.draw(menuMap);
         menu.draw();
+        window.draw(mult);
+        if(opts.players == 2) window.draw(ok);
         window.draw(titul);
         window.display();
     }

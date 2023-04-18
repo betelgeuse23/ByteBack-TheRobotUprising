@@ -24,6 +24,7 @@ public:
 	int MoveDown(); 
 	int getSelectedMenuNumber();
 
+	void ColorChoose(sf::RenderWindow& window, struct Options& opts);
 	void Options(sf::RenderWindow& window, sf::Music& mus, struct Options& opts);
 	void Tutorial(sf::RenderWindow& window);
 	bool savingScreen(sf::RenderWindow& window);
