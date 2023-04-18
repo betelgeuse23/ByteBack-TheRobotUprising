@@ -8,6 +8,8 @@
 #include "menu.h"
 #include <fstream>
 
+class Menu;
+
 class Game {
 public:
 	void startGame(sf::RenderWindow& window, sf::Clock& clock, Menu& menu);

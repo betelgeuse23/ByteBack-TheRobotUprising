@@ -31,7 +31,7 @@ int main() {
     menuSprite.setTexture(menuTexture);
 
     sf::String name_menu[]{ L"NEW GAME", L"CONTINUE", L"CHOOSE LEVEL", L"CREATE LEVEL", L"OPTIONS", L"TUTORIAL", L"QUIT"};
-    Menu menu(window, name_menu, 7);
+    Menu menu(window, name_menu, 7, 96, 192, 30, 64);
     Game game;
 
     while (window.isOpen()) {
@@ -61,7 +61,7 @@ int main() {
             {
                 switch (menu.getSelectedMenuNumber())
                 {
-                case 0:game.setLevel(10);  game.startGame(window, clock, menu);   break;
+                case 0:game.setLevel(1);  game.startGame(window, clock, menu);   break;
                 case 1: {
                     std::ifstream file("save.txt");
                     std::string lvl;
@@ -70,6 +70,8 @@ int main() {
                     game.startGame(window, clock, menu);
                     break;
                 }
+                case 2:menu.chooseScreen(window); break;
+                case 3:menu.createScreen(window); break;
                 case 4:menu.Options(window);  break;
                 case 5:menu.Tutorial(window); break;
                 case 6:window.close(); break;

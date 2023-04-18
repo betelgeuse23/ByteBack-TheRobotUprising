@@ -1,13 +1,13 @@
 #include "menu.h"
 
-Menu::Menu(sf::RenderWindow& window, sf::String name[], int itm)
-	:menuWindow(window), items(itm)
+Menu::Menu(sf::RenderWindow& window, sf::String name[], int itm, int xpos, int ypos, int sz, int dstn)
+	:menuWindow(window), items(itm), xposition(xpos), yposition(ypos), size(sz), distance(dstn)
 {  
 	font.loadFromFile("fonts/arial.ttf");
 	mainMenu = new sf::Text[items];
-    for (int i = 0, ypos = 192; i < items; i++, ypos += 64)
-        if (i == 0) setInitText(mainMenu[i], name[i], 96, ypos, 1);
-        else setInitText(mainMenu[i], name[i], 96, ypos, 0);
+    for (int i = 0; i < items; i++, yposition += distance)
+        if (i == 0) setInitText(mainMenu[i], name[i], xposition, yposition, 1);
+        else setInitText(mainMenu[i], name[i], xposition, yposition, 0);
 	mainMenuSelected = 0; 
 }
 
@@ -17,7 +17,7 @@ void Menu::setInitText(sf::Text& text, sf::String str, float xpos, float ypos, b
     if (first) text.setFillColor(main_text_color);
     else text.setFillColor(menu_text_color);
 	text.setString(str);                
-	text.setCharacterSize(30);
+	text.setCharacterSize(size);
 	text.setLetterSpacing(2);
 	text.setPosition(xpos, ypos);
 }
@@ -308,6 +308,154 @@ void Menu::loseScreen(sf::RenderWindow& window) {
         window.clear();
         window.draw(titul);
         window.draw(txt);
+        window.display();
+    }
+}
+
+void Menu::chooseScreen(sf::RenderWindow& window) {
+    sf::Clock clock;
+    float delay = 0;
+
+    TileMap menuMap;
+    int map[729] = { 0 };
+    menuMap.load("images/tileset.png", sf::Vector2u(32, 32), map, WIDTH + 6, WIDTH);
+
+    sf::Font fontPixel;
+    fontPixel.loadFromFile("fonts/pixel.ttf");
+    sf::Text titul("Main game:", fontPixel, 40);
+    titul.setFillColor(sf::Color::White);
+    titul.setPosition(33, 50);
+
+    sf::String name_lvl[]{ L"lvl 1", L"lvl 2", L"lvl 3", L"lvl 4", L"lvl 5", L"lvl 6", L"lvl 7", L"lvl 8", L"lvl 9", L"lvl 10" };
+    Menu menu(window, name_lvl, 10, 96, 128, 25, 32);
+    Game game;
+
+    while (window.isOpen()) {
+        sf::Event event;
+
+        float time = clock.getElapsedTime().asMilliseconds();
+        clock.restart();
+        delay += time;
+
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed) { window.close(); }
+            if (event.type == sf::Event::KeyPressed)
+            {
+                if (event.key.code == sf::Keyboard::Escape) return;
+            }
+            if (event.key.code == sf::Keyboard::Up) {
+                if (delay > 300)
+                {
+                    menu.MoveUp();
+                    delay = 0;
+                }
+            }
+            if (event.key.code == sf::Keyboard::Down) {
+                if (delay > 300)
+                {
+                    menu.MoveDown();
+                    delay = 0;
+                }
+            }
+            if (event.key.code == sf::Keyboard::Return)
+            {
+                if (delay > 300) {
+                    delay = 0;
+                switch (menu.getSelectedMenuNumber())
+                {
+                case 0:game.setLevel(1);  game.startGame(window, clock, menu);   break;
+                case 1:game.setLevel(2);  game.startGame(window, clock, menu);   break;
+                case 2:game.setLevel(3);  game.startGame(window, clock, menu);   break;
+                case 3:game.setLevel(4);  game.startGame(window, clock, menu);   break;
+                case 4:game.setLevel(5);  game.startGame(window, clock, menu);   break;
+                case 5:game.setLevel(6);  game.startGame(window, clock, menu);   break;
+                case 6:game.setLevel(7);  game.startGame(window, clock, menu);   break;
+                case 7:game.setLevel(8);  game.startGame(window, clock, menu);   break;
+                case 8:game.setLevel(9);  game.startGame(window, clock, menu);   break;
+                case 9:game.setLevel(10);  game.startGame(window, clock, menu);   break;
+                }
+            }
+            }
+        }
+        window.clear(sf::Color::Black);
+        window.draw(menuMap);
+        menu.draw();
+        window.draw(titul);
+        window.display();
+    }
+}
+
+void Menu::createScreen(sf::RenderWindow& window) {
+    sf::Clock clock;
+    float delay = 0;
+
+    TileMap menuMap;
+    int map[729] = { 0 };
+    menuMap.load("images/tileset.png", sf::Vector2u(32, 32), map, WIDTH + 6, WIDTH);
+
+    sf::Font fontPixel;
+    fontPixel.loadFromFile("fonts/pixel.ttf");
+    sf::Text titul("My levels:", fontPixel, 40);
+    titul.setFillColor(sf::Color::White);
+    titul.setPosition(33, 50);
+
+    std::ifstream file("save.txt");
+    std::string line;
+    int line_count = 1;
+    while (std::getline(file, line)) {
+        if (line_count == 4) {
+            break;
+        }
+        line_count++;
+    }
+    file.close();
+
+    std::stringstream ss(line);
+    sf::String name_lvl[3];
+    for (int i = 0; i < 3; i++) {
+        std::string temp;
+        std::getline(ss, temp, ',');
+        name_lvl[i] = sf::String(temp);
+    }
+
+    Menu menu(window, name_lvl, 3, 96, 128, 25, 32);
+    Game game;
+
+    while (window.isOpen()) {
+        sf::Event event;
+
+        float time = clock.getElapsedTime().asMilliseconds();
+        clock.restart();
+        delay += time;
+
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed) { window.close(); }
+            if (event.key.code == sf::Keyboard::Up) {
+                if (delay > 300)
+                {
+                    menu.MoveUp();
+                    delay = 0;
+                }
+            }
+            if (event.key.code == sf::Keyboard::Down) {
+                if (delay > 300)
+                {
+                    menu.MoveDown();
+                    delay = 0;
+                }
+            }
+            if (event.key.code == sf::Keyboard::Return)
+            {
+                /*switch (menu.getSelectedMenuNumber())
+                {
+                case 0:
+                }*/
+            }
+        }
+        window.clear(sf::Color::Black);
+        window.draw(menuMap);
+        menu.draw();
+        window.draw(titul);
         window.display();
     }
 }
