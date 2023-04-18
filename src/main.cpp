@@ -48,7 +48,6 @@ int main() {
         float time = clock.getElapsedTime().asMilliseconds();
         clock.restart();
         delay += time;
-
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) { window.close(); }
             if (event.key.code == sf::Keyboard::Up) { 
@@ -69,12 +68,9 @@ int main() {
             {
                 switch (menu.getSelectedMenuNumber())
                 {
-                case 0: 
-                    music.pause(); 
-                    game.setLevel(1);  
-                    game.startGame(window, clock, menu, opts); 
-                    if (opts.music) music.play();  
-                    break;
+                case 0:
+                    opts.level = 1;
+                    opts.setOpts();
                 case 1: {
                     music.pause();
                     game.setLevel(opts.level);

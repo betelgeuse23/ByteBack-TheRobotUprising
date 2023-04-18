@@ -230,6 +230,15 @@ void Utils::vecCout(sf::Vector2i size, std::vector<std::vector<int>> vec) {
 	} std::cout << std::endl;
 }
 
+int Utils::vPos(sf::Vector2f v) {
+	return vPos(gPos(v));
+}
+int Utils::vPos(sf::Vector2i v) {
+	return v.x + v.y * WIDTH;
+}
+
+
+
 void Mpl::playShoot() {
 	sb.loadFromFile("sounds/laserShoot.wav");
 	s = sf::Sound(sb);
@@ -363,7 +372,7 @@ void Player::shoot(Level* level) {
 
 void Spawner::spawn(int* map) {
 	sf::Vector2i size = level->size;
-	for (int i = 0, t = 0; i < size.x; i++) for (int j = 0; j < size.y; j++, t++) {
+	for (int i = 0, t = 0, p = 0; i < size.x; i++) for (int j = 0; j < size.y; j++, t++) {
 		switch (map[t]) {
 		case 11:
 			spawnRobot1(sf::Vector2i(j, i));
@@ -381,7 +390,9 @@ void Spawner::spawn(int* map) {
 			spawnRobot5(sf::Vector2i(j, i));
 			break;
 		case 20:
-			spawnPlayer(std::rand()%4, sf::Vector2i(j, i));
+			if (colors != sf::Vector2i(0, 0) && p < 2) spawnPlayer(p==0?colors.x:colors.y, sf::Vector2i(j, i));
+			if(colors == sf::Vector2i(0, 0) && p < 1) spawnPlayer(std::rand()%4, sf::Vector2i(j, i));
+			p++;
 			break;
 		}
 	}

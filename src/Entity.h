@@ -124,6 +124,8 @@ class Utils {
 public:
     static sf::Vector2i makeDir(Direction);
     static sf::Vector2i gPos(sf::Vector2f);
+    static int vPos(sf::Vector2i);
+    static int vPos(sf::Vector2f);
     static void vecCout(sf::Vector2i, std::vector<std::vector<int>>);
 };
 
@@ -187,8 +189,10 @@ public:
         pfEA = PathFinder(level, { {0, 1}, {6, 1}, {1, 2}, { 2, 3 }, { 3, 1 }, { 4, 1 } });
         pfEB = PathFinder(level, { {0, 1}, {6, 1}, {1, 2}, { 2, 3 }, { 3, 1 } });
     };
+    void setCols(sf::Vector2i cols) { colors = cols; };
     void spawn(int*);
 private:
+    sf::Vector2i colors = sf::Vector2i(0,0);
     Level* level;
     PathFinder pfP, pfE, pfEA, pfEB;
 
