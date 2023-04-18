@@ -31,7 +31,7 @@ public:
 	void winScreen(sf::RenderWindow& window);
 	void loseScreen(sf::RenderWindow& window);
 	void chooseScreen(sf::RenderWindow& window, struct Options& opts);
-	void createScreen(sf::RenderWindow& window);
+	void createScreen(sf::RenderWindow& window, struct Options& opts);
 	void levelScreen(sf::RenderWindow& window, sf::Clock& clock);
 	void fileNameScreen(sf::RenderWindow& window, int* map);
 

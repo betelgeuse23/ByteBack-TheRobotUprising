@@ -73,7 +73,7 @@ int main() {
                 case 1: {
                     music.pause();
                     game.setLevel(opts.level);
-                    game.startGame(window, clock, menu, opts);
+                    game.startGame(window, clock, menu, opts, 0);
                     if (opts.music) music.play();
                     break;
                 }
@@ -82,7 +82,7 @@ int main() {
                     menu.chooseScreen(window, opts);  
                     if (opts.music) music.play();
                     break;
-                case 3:menu.createScreen(window); break;
+                case 3:menu.createScreen(window, opts); break;
                 case 4:menu.Options(window, music, opts);  break;
                 case 5:menu.Tutorial(window); break;
                 case 6:window.close(); break;
