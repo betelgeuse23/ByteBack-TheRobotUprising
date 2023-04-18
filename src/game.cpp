@@ -3,6 +3,11 @@
 void Game::startGame(sf::RenderWindow& window, sf::Clock& clock, Menu& menu) {
     std::srand(time(0));
 
+    sf::Music music;
+    music.openFromFile("sounds/gameSong.wav");
+    music.setLoop(true);
+    music.play();
+
     // текстуры
     sf::Texture bulletTexture;
     bulletTexture.loadFromFile("images/bullet.png");
@@ -144,15 +149,17 @@ void Game::startGame(sf::RenderWindow& window, sf::Clock& clock, Menu& menu) {
         }
 
         if (level1.players.empty()) {
+            level1.pl.playLoose();
             menu.loseScreen(window);
             return;
         }
 
         if (level1.enemies.empty()) {
+            music.stop();
+            level1.pl.playWin();
             if (level == 10) {
                 level = 1;
                 menu.winScreen(window);
-                return;
             }
             else {
                 level++;
@@ -163,6 +170,7 @@ void Game::startGame(sf::RenderWindow& window, sf::Clock& clock, Menu& menu) {
                 game.setLevel(level);
                 game.startGame(window, clock, menu);
             }
+            return;
         }
 
         window.display();

@@ -19,6 +19,7 @@ bool Bullet::checkCollisions(Level* level) {
 		if (tile != 5) {
 			level->map[globalPos.x][globalPos.y]--;
 			if (damage > 1 && tile == 2) level->map[globalPos.x][globalPos.y]--;
+			level->pl.playHit();
 		}
 		return true;
 	}
@@ -27,6 +28,7 @@ bool Bullet::checkCollisions(Level* level) {
 		for (auto& p : level->players)
 			if (Utils::gPos(p->getSpritePosition()) == globalPos) {
 				p->doDamage(damage);
+				level->pl.playHit();
 				return true;
 			}
 
@@ -34,6 +36,7 @@ bool Bullet::checkCollisions(Level* level) {
 		for (auto& e : level->enemies)
 			if (Utils::gPos(e->getSpritePosition()) == globalPos) {
 				e->doDamage(damage);
+				level->pl.playHit();
 				return true;
 			}
 

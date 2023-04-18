@@ -25,7 +25,20 @@ class Bullet;
 class Spawner;
 enum Effects;
 
+class Mpl {
+public:
+    void playShoot();
+    void playHit();
+    void playGet();
+    void playLoose();
+    void playWin();
+private:
+    sf::SoundBuffer sb;
+    sf::Sound s;
+};
+
 struct Level {
+    Mpl pl;
     sf::Vector2i size;
     sf::Vector2i base;
     std::vector<Enemy*> enemies;
@@ -157,6 +170,8 @@ private:
     int damage = 1;
     int rate = 1000;
     Effects effect = Effects(6);
+    sf::SoundBuffer sbS, sbD, sbB;
+    sf::Sound sS, sD, sB;
 
     bool isCharged();
 };

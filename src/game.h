@@ -1,6 +1,7 @@
 #pragma once
 #define WIDTH 21
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include "TileMap.h"
 #include "bullet.h"
 #include "Entity.h"

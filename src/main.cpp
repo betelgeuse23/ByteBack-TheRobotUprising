@@ -8,6 +8,11 @@ int main() {
     float delay = 0;
     int gameLevel = 0;
 
+    sf::Music music;
+    music.openFromFile("sounds/menuSong.wav");
+    music.setLoop(true);
+    music.play();
+
     // текст
     sf::Font fontPixel;
     fontPixel.loadFromFile("fonts/pixel.ttf");
@@ -61,16 +66,18 @@ int main() {
             {
                 switch (menu.getSelectedMenuNumber())
                 {
-                case 0:game.setLevel(1);  game.startGame(window, clock, menu);   break;
+                case 0: music.pause(); game.setLevel(1);  game.startGame(window, clock, menu); music.play();  break;
                 case 1: {
+                    music.pause();
                     std::ifstream file("save.txt");
                     std::string lvl;
                     getline(file, lvl);
                     game.setLevel(std::stoi(lvl));
                     game.startGame(window, clock, menu);
+                    music.play();
                     break;
                 }
-                case 2:menu.chooseScreen(window); break;
+                case 2: music.pause();  menu.chooseScreen(window); music.play(); break;
                 case 3:menu.createScreen(window); break;
                 case 4:menu.Options(window);  break;
                 case 5:menu.Tutorial(window); break;

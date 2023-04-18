@@ -230,6 +230,36 @@ void Utils::vecCout(sf::Vector2i size, std::vector<std::vector<int>> vec) {
 	} std::cout << std::endl;
 }
 
+void Mpl::playShoot() {
+	sb.loadFromFile("sounds/laserShoot.wav");
+	s = sf::Sound(sb);
+	s.play();
+}
+
+void Mpl::playHit() {
+	sb.loadFromFile("sounds/hitHurt.wav");
+	s = sf::Sound(sb);
+	s.play();
+}
+
+void Mpl::playGet() {
+	sb.loadFromFile("sounds/powerUp.wav");
+	s = sf::Sound(sb);
+	s.play();
+}
+
+void Mpl::playLoose() {
+	sb.loadFromFile("sounds/loose.wav");
+	s = sf::Sound(sb);
+	s.play();
+}
+
+void Mpl::playWin() {
+	sb.loadFromFile("sounds/win.wav");
+	s = sf::Sound(sb);
+	s.play();
+}
+
 
 
 bool Enemy::doDamage(int d) {
@@ -252,6 +282,7 @@ void Enemy::initStats(int h, int r, int d, float s) {
 void Enemy::shoot(Level* level, Direction dir) {
 	if (isCharged()) {
 		level->bullets.push_back(new Bullet(position, dir, damage, false));
+		level->pl.playShoot();
 	}
 }
 
@@ -292,6 +323,8 @@ void Player::affect(Effects eff) {
 	effect = eff;
 	bonus.restart();
 
+	if (eff != Spare && eff != Stan) pf->getLevel()->pl.playGet();
+
 	if(eff != Speed) speed = 0.2;
 	else if (speed < 0.4) speed += 0.1;
 
@@ -322,6 +355,7 @@ bool Player::isCharged() {
 void Player::shoot(Level* level) {
 	if (isCharged()) {
 		level->bullets.push_back(new Bullet(sprite.getPosition(), lastDirection, damage, true));
+		level->pl.playShoot();
 	}
 }
 
