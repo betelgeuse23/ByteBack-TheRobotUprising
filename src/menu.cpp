@@ -411,14 +411,15 @@ void Menu::createScreen(sf::RenderWindow& window) {
     file.close();
 
     std::stringstream ss(line);
-    sf::String name_lvl[3];
+    sf::String name_lvl[4];
     for (int i = 0; i < 3; i++) {
         std::string temp;
         std::getline(ss, temp, ',');
         name_lvl[i] = sf::String(temp);
     }
+    name_lvl[3] = "CREATE A LEVEL";
 
-    Menu menu(window, name_lvl, 3, 96, 128, 25, 32);
+    Menu menu(window, name_lvl, 4, 96, 128, 25, 32);
     Game game;
 
     while (window.isOpen()) {
@@ -429,7 +430,11 @@ void Menu::createScreen(sf::RenderWindow& window) {
         delay += time;
 
         while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed) { window.close(); }
+            if (event.type == sf::Event::Closed) window.close();
+            if (event.type == sf::Event::KeyPressed)
+            {
+                if (event.key.code == sf::Keyboard::Escape) return;
+            }
             if (event.key.code == sf::Keyboard::Up) {
                 if (delay > 300)
                 {
@@ -446,16 +451,101 @@ void Menu::createScreen(sf::RenderWindow& window) {
             }
             if (event.key.code == sf::Keyboard::Return)
             {
-                /*switch (menu.getSelectedMenuNumber())
+                switch (menu.getSelectedMenuNumber())
                 {
-                case 0:
-                }*/
+                case 3: menu.levelScreen(window, clock); break;
+                }
             }
         }
         window.clear(sf::Color::Black);
         window.draw(menuMap);
         menu.draw();
         window.draw(titul);
+        window.display();
+    }
+}
+
+void Menu::levelScreen(sf::RenderWindow& window, sf::Clock& clock) {
+    std::srand(time(0));
+    float delay = 0;
+
+    sf::Font font;
+    font.loadFromFile("fonts/pixel.ttf");
+
+    sf::Text blocksText("Blocks", font, 32);
+    blocksText.setLetterSpacing(1);
+    blocksText.setFillColor(sf::Color::White);
+    blocksText.setPosition(680, 10);
+
+    sf::Texture blocksTexture;
+    blocksTexture.loadFromFile("images/tilesetLvl.png");
+    sf::Sprite blocks;
+    blocks.setTexture(blocksTexture);
+    blocks.setPosition(673, 64);
+
+    TileMap menuMap;
+    int map[441] = { 0 };
+    map[0] = 20;
+    
+    Level level1;
+    level1.size = sf::Vector2i(WIDTH, WIDTH);
+    level1.translate(map);
+    Spawner sp(&level1);
+    sp.spawn(map);
+
+    menuMap.load("images/tileset.png", sf::Vector2u(32, 32), level1.map, WIDTH, WIDTH);
+
+    sf::String lvlBlocks[6] = { "0", "1", "2", "3", "4", "5"};
+    Menu menu(window, lvlBlocks, 4, 96, 128, 25, 32);
+
+    // работа с окном
+    while (window.isOpen())
+    {
+        float time = clock.getElapsedTime().asMilliseconds();
+        clock.restart();
+
+        sf::Event event;
+        while (window.pollEvent(event))
+        {
+            if (event.type == sf::Event::Closed) window.close();
+            if (event.type == sf::Event::KeyPressed)
+            {
+                // Закрываем окно
+                if (event.key.code == sf::Keyboard::Escape) {
+                    if (menu.savingScreen(window)) return;
+                }
+            }
+        }
+
+        // обработка нажатий клавиш
+        if (!level1.players.empty()) {
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
+                level1.players[0]->move(Left);
+            }
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
+                level1.players[0]->move(Right);
+            }
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
+                level1.players[0]->move(Up);
+            }
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
+                level1.players[0]->move(Down);
+            }
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
+                level1.players[0]->shoot(&level1);
+            }
+        }
+
+        window.clear(sf::Color::Black);
+        window.draw(menuMap);
+        window.draw(blocksText);
+        window.draw(blocks);
+
+        for (auto& p : level1.players) {
+            p->update();
+            p->draw(window);
+        }
+
         window.display();
     }
 }

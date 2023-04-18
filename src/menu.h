@@ -31,6 +31,7 @@ public:
 	void loseScreen(sf::RenderWindow& window);
 	void chooseScreen(sf::RenderWindow& window);
 	void createScreen(sf::RenderWindow& window);
+	void levelScreen(sf::RenderWindow& window, sf::Clock& clock);
 
 private:
 	int mainMenuSelected;
