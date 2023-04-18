@@ -675,7 +675,17 @@ void Menu::createScreen(sf::RenderWindow& window, struct Options& opts) {
             if (event.key.code == sf::Keyboard::Return)
             {
                 switch (menu.getSelectedMenuNumber()) {
-                    case 3: menu.levelScreen(window, clock);
+                    case 0: 
+                        game.setLevel(0);
+                        game.startGame(window, clock, menu, opts, 1);
+                    case 1: 
+                        game.setLevel(0);
+                        game.startGame(window, clock, menu, opts, 1);
+                    case 2: 
+                        game.setLevel(0);
+                        game.startGame(window, clock, menu, opts, 1);
+                    case 3: 
+                        menu.levelScreen(window, clock);
                     break;
                 }
             }
