@@ -32,7 +32,7 @@ public:
 	void loseScreen(sf::RenderWindow& window);
 	void chooseScreen(sf::RenderWindow& window, struct Options& opts);
 	void createScreen(sf::RenderWindow& window);
-	void levelScreen(sf::RenderWindow& window, sf::Clock& clock, Menu menu);
+	void levelScreen(sf::RenderWindow& window, sf::Clock& clock);
 	void fileNameScreen(sf::RenderWindow& window, int* map);
 
 private:

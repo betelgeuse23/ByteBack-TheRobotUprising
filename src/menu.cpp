@@ -674,9 +674,9 @@ void Menu::createScreen(sf::RenderWindow& window) {
             }
             if (event.key.code == sf::Keyboard::Return)
             {
-                switch (menu.getSelectedMenuNumber())
-                {
-                case 3: menu.levelScreen(window, clock, menu); break;
+                switch (menu.getSelectedMenuNumber()) {
+                    case 3: menu.levelScreen(window, clock);
+                    break;
                 }
             }
         }
@@ -688,8 +688,8 @@ void Menu::createScreen(sf::RenderWindow& window) {
     }
 }
 
-void Menu::levelScreen(sf::RenderWindow& window, sf::Clock& clock, Menu menu) {
-    std::srand(time(0));
+void Menu::levelScreen(sf::RenderWindow& window, sf::Clock& clock) {
+    std::map<int, int> block = { {0,0},{1,1},{2,2},{3,3},{4,4}, {5,5}, {6,11}, {7,12}, {8,13}, {9,14}, {10,15},{11,20} };
     float delay = 0;
 
     sf::Font font;
@@ -714,15 +714,17 @@ void Menu::levelScreen(sf::RenderWindow& window, sf::Clock& clock, Menu menu) {
 
     TileMap menuMap;
     int map[441] = { 0 };
-    map[0] = 45;
     
     Level level1;
     level1.size = sf::Vector2i(WIDTH, WIDTH);
     level1.translate(map);
-    Spawner sp(&level1);
-    sp.spawn(map);
 
-    menuMap.load("images/tileset.png", sf::Vector2u(32, 32), level1.map, WIDTH, WIDTH);
+    Player* pl = new Player("images/Cursor.png", sf::Vector2i(0, 0), 1);
+    PathFinder pfA(&level1, { { 45, 1 } });
+    pl->initPatfind(&pfA);
+    pl->initAnimation({ {Moving, 1} });
+
+    
 
     int selectedBlock = 0;
 
@@ -737,43 +739,37 @@ void Menu::levelScreen(sf::RenderWindow& window, sf::Clock& clock, Menu menu) {
         while (window.pollEvent(event))
         {
             if (event.type == sf::Event::Closed) window.close();
-            if (event.type == sf::Event::KeyPressed)
-            {
-                // «акрываем окно
+            if (event.type == sf::Event::KeyPressed) {
                 if (event.key.code == sf::Keyboard::Escape) return;
             }
         }
 
-        // обработка нажатий клавиш
-        if (!level1.players.empty()) {
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
-                level1.players[0]->move(Left);
+                pl->move(Left);
             }
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
-                level1.players[0]->move(Right);
+                pl->move(Right);
             }
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
-                level1.players[0]->move(Up);
+                pl->move(Up);
             }
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
-                level1.players[0]->move(Down);
+                pl->move(Down);
             }
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
-                /*int temp = (level1.players[0]->getPosition());
-                if (selectedBlock == 0) map[temp] = selectedBlock;
-                else map[temp] = map[temp] = selectedBlock + 1;*/
+                map[Utils::vPos(pl->getPosition())] = block[selectedBlock];
             }
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z)) {
                 if (delay > 300)
                 {
-                    (selectedBlock == 0) ? selectedBlock = 5 : selectedBlock--;
+                    (selectedBlock == 0) ? selectedBlock = 11 : selectedBlock--;
                     delay = 0;
                 }
             }
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::X)) {
                 if (delay > 300)
                 {
-                    (selectedBlock == 5) ? selectedBlock = 0 : selectedBlock++;
+                    (selectedBlock == 11) ? selectedBlock = 0 : selectedBlock++;
                     delay = 0;
                 }
             }
@@ -784,20 +780,17 @@ void Menu::levelScreen(sf::RenderWindow& window, sf::Clock& clock, Menu menu) {
                     delay = 0;
                 }
             }
-        }
+
+        menuMap.load("images/tileset.png", sf::Vector2u(32, 32), map, WIDTH, WIDTH);
+        pl->update();
 
         window.clear(sf::Color::Black);
         window.draw(menuMap);
         window.draw(blocksText);
         window.draw(blocks);
-        frame.setPosition(673 + selectedBlock * 32, 64);
+        frame.setPosition(673 + (selectedBlock % 6) * 32, 64 + 32 * (int)(selectedBlock / 6));
         window.draw(frame);
-
-        for (auto& p : level1.players) {
-            p->update();
-            p->draw(window);
-        }
-
+        pl->draw(window);
         window.display();
     }
 }
