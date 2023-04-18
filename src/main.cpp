@@ -35,8 +35,8 @@ int main() {
     sf::Sprite menuSprite;
     menuSprite.setTexture(menuTexture);
 
-    sf::String name_menu[]{ L"NEW GAME", L"CONTINUE", L"CHOOSE LEVEL", L"CREATE LEVEL", L"OPTIONS", L"TUTORIAL", L"QUIT"};
-    Menu menu(window, name_menu, 7, 96, 192, 30, 64);
+    sf::String name_menu[]{ L"NEW GAME", L"CONTINUE", L"CHOOSE LEVEL", L"MULTIPLAYER", L"CREATE LEVEL", L"OPTIONS", L"TUTORIAL", L"QUIT"};
+    Menu menu(window, name_menu, 8, 96, 160, 30, 64);
     Game game;
 
     while (window.isOpen()) {
@@ -78,10 +78,11 @@ int main() {
                     break;
                 }
                 case 2: music.pause();  menu.chooseScreen(window); music.play(); break;
-                case 3:menu.createScreen(window); break;
-                case 4:menu.Options(window);  break;
-                case 5:menu.Tutorial(window); break;
-                case 6:window.close(); break;
+                    //
+                case 4:menu.createScreen(window); break;
+                case 5:menu.Options(window);  break;
+                case 6:menu.Tutorial(window); break;
+                case 7:window.close(); break;
 
                 }
             }
@@ -91,7 +92,7 @@ int main() {
         window.draw(titulFirst);
         window.draw(titulSecond);
         menu.draw();
-        point.setPosition(40, (menu.getSelectedMenuNumber() * 2 + 6) * 32);
+        point.setPosition(40, (menu.getSelectedMenuNumber() * 2 + 5) * 32);
         window.draw(point);
         window.display();
     }
