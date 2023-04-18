@@ -778,13 +778,15 @@ void Menu::levelScreen(sf::RenderWindow& window, sf::Clock& clock) {
                 {
                     fileNameScreen(window, map);
                     delay = 0;
+                    clock.restart();
                 }
             }
 
-        menuMap.load("images/tileset.png", sf::Vector2u(32, 32), map, WIDTH, WIDTH);
+        menuMap.load("images/tileset1.png", sf::Vector2u(32, 32), map, WIDTH, WIDTH);
         pl->update();
 
         window.clear(sf::Color::Black);
+        level1.translate(map);
         window.draw(menuMap);
         window.draw(blocksText);
         window.draw(blocks);
@@ -806,7 +808,7 @@ void Menu::fileNameScreen(sf::RenderWindow& window, int* map) {
     titulEnter.setLetterSpacing(2);
     titulEnter.setFillColor(sf::Color::White);
     titulEnter.setPosition(20, 10);
-    sf::Text txtEnter("Press Esc to save and exit.", fontArial, 30);
+    sf::Text txtEnter("Press Enter to save and exit.", fontArial, 30);
     txtEnter.setLetterSpacing(2);
     txtEnter.setFillColor(sf::Color::White);
     txtEnter.setPosition(20, 60);
@@ -833,18 +835,18 @@ void Menu::fileNameScreen(sf::RenderWindow& window, int* map) {
             if (event.type == sf::Event::Closed);
             if (event.type == sf::Event::KeyPressed)
             {
+                if (event.key.code == sf::Keyboard::Escape) return;
+
                 if (event.key.code == sf::Keyboard::Return) {
-                    std::stringstream ss(userInput);
+                    std::stringstream aa(userInput);
                     std::vector<std::string> words;
                     std::string word;
 
-                    while (ss >> word) {
+                    while (aa >> word) {
                         words.push_back(word);
                     }
 
-                    for (const auto& w : words) {
-                        std::cout << w << std::endl;
-                    }
+                    if (words.size() < 2 || !(words[0].size() == 1 && words[0][0] >= '1' && words[0][0] <= '3')) break;
 
                     std::string filename = "save.txt"; 
                     std::ifstream infile(filename);
@@ -861,12 +863,12 @@ void Menu::fileNameScreen(sf::RenderWindow& window, int* map) {
                     while (std::getline(ss1, value, ',')) {
                         values.push_back(value);
                     }
-                    values[std::stoi(words[0])] = words[1];
+                    values[(int)words[0][0] - (int)'0' - 1] = words[1];
 
                     std::stringstream new_line;
                     for (size_t i = 0; i < values.size(); i++) {
                         if (i > 0) {
-                            new_line << ", ";
+                            new_line << ",";
                         }
                         new_line << values[i];
                     }
@@ -877,6 +879,30 @@ void Menu::fileNameScreen(sf::RenderWindow& window, int* map) {
                         outfile << l << std::endl;
                     }
                     outfile.close();
+
+                    /////////////////////////////
+                    std::ifstream infile1(filename);
+                    std::vector<std::string> lines1;
+                    std::string line1;
+                    while (std::getline(infile1, line1)) {
+                        lines1.push_back(line1);
+                    }
+                    infile1.close();
+                    std::stringstream bb;
+                    for (size_t i = 0; i < 441; i++) {
+                        if (i > 0) {
+                            bb << " ";
+                        }
+                        bb << map[i];
+                    }
+                    lines1[6] = bb.str();
+                    std::ofstream outfile1(filename);
+                    for (const auto& l : lines1) {
+                        outfile1 << l << std::endl;
+                    }
+                    outfile1.close();
+
+                    return;
                 }
             }
             if (event.type == sf::Event::TextEntered)
