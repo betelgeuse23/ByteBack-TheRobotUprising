@@ -584,16 +584,16 @@ void Menu::chooseScreen(sf::RenderWindow& window, struct Options& opts) {
                 if (delay > 300) {
                     delay = 0;
                     switch (menu.getSelectedMenuNumber()) {
-                        case 0:game.setLevel(1);  game.startGame(window, clock, menu, opts);   break;
-                        case 1:game.setLevel(2);  game.startGame(window, clock, menu, opts);   break;
-                        case 2:game.setLevel(3);  game.startGame(window, clock, menu, opts);   break;
-                        case 3:game.setLevel(4);  game.startGame(window, clock, menu, opts);   break;
-                        case 4:game.setLevel(5);  game.startGame(window, clock, menu, opts);   break;
-                        case 5:game.setLevel(6);  game.startGame(window, clock, menu, opts);   break;
-                        case 6:game.setLevel(7);  game.startGame(window, clock, menu, opts);   break;
-                        case 7:game.setLevel(8);  game.startGame(window, clock, menu, opts);   break;
-                        case 8:game.setLevel(9);  game.startGame(window, clock, menu, opts);   break;
-                        case 9:game.setLevel(10);  game.startGame(window, clock, menu, opts);   break;
+                        case 0:game.setLevel(1);  game.startGame(window, clock, menu, opts, 1);   break;
+                        case 1:game.setLevel(2);  game.startGame(window, clock, menu, opts, 1);   break;
+                        case 2:game.setLevel(3);  game.startGame(window, clock, menu, opts, 1);   break;
+                        case 3:game.setLevel(4);  game.startGame(window, clock, menu, opts, 1);   break;
+                        case 4:game.setLevel(5);  game.startGame(window, clock, menu, opts, 1);   break;
+                        case 5:game.setLevel(6);  game.startGame(window, clock, menu, opts, 1);   break;
+                        case 6:game.setLevel(7);  game.startGame(window, clock, menu, opts, 1);   break;
+                        case 7:game.setLevel(8);  game.startGame(window, clock, menu, opts, 1);   break;
+                        case 8:game.setLevel(9);  game.startGame(window, clock, menu, opts, 1);   break;
+                        case 9:game.setLevel(10);  game.startGame(window, clock, menu, opts, 1);   break;
                     }
                 }
             }
@@ -608,7 +608,7 @@ void Menu::chooseScreen(sf::RenderWindow& window, struct Options& opts) {
     }
 }
 
-void Menu::createScreen(sf::RenderWindow& window) {
+void Menu::createScreen(sf::RenderWindow& window, struct Options& opts) {
     sf::Clock clock;
     float delay = 0;
 
@@ -891,7 +891,7 @@ void Menu::fileNameScreen(sf::RenderWindow& window, int* map) {
                     std::stringstream bb;
                     for (size_t i = 0; i < 441; i++) {
                         if (i > 0) {
-                            bb << " ";
+                            bb << ",";
                         }
                         bb << map[i];
                     }

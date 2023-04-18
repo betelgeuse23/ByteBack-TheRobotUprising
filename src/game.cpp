@@ -1,8 +1,8 @@
 #include "game.h"
 
-void Game::startGame(sf::RenderWindow& window, sf::Clock& clock, Menu& menu, Options& opts) {
+void Game::startGame(sf::RenderWindow& window, sf::Clock& clock, Menu& menu, Options& opts, bool usr) {
     std::srand(time(0));
-
+    user = usr;
     if (opts.players == 2 && opts.cols == sf::Vector2i(0, 0)) menu.ColorChoose(window, opts);
 
     sf::Music music;
@@ -37,7 +37,30 @@ void Game::startGame(sf::RenderWindow& window, sf::Clock& clock, Menu& menu, Opt
     healthText.setFillColor(sf::Color::White);
     healthText.setPosition(680, 10);
 
-    int* lvl = Map::getMap(level);
+    int* lvl;
+    if (user) {
+        std::string filename = "save.txt";
+        std::ifstream infile(filename);
+        std::vector<std::string> lines;
+        std::string line;
+        while (std::getline(infile, line)) {
+            lines.push_back(line);
+        }
+        infile.close();
+        std::stringstream ss(lines[6]);
+        std::string num_str;
+        std::vector<int> nums;
+        while (std::getline(ss, num_str, ',')) {
+            nums.push_back(std::stoi(num_str));
+        }
+        int arr[441];
+        for (size_t i = 0; i < nums.size(); i++) {
+            arr[i] = nums[i];
+        }
+        lvl = arr;
+    }
+    else lvl = Map::getMap(level);
+
     TileMap map;
 
     Level level1;
@@ -188,7 +211,7 @@ void Game::startGame(sf::RenderWindow& window, sf::Clock& clock, Menu& menu, Opt
                 opts.setOpts();
                 Game game;
                 game.setLevel(level);
-                game.startGame(window, clock, menu, opts);
+                game.startGame(window, clock, menu, opts, 0);
             }
             opts.cols = sf::Vector2i(0, 0);
             return;
