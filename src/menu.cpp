@@ -718,11 +718,8 @@ void Menu::levelScreen(sf::RenderWindow& window, sf::Clock& clock, Menu menu) {
     
     Level level1;
     level1.size = sf::Vector2i(WIDTH, WIDTH);
-    level1.translate(map);
     Spawner sp(&level1);
     sp.spawn(map);
-
-    menuMap.load("images/tileset.png", sf::Vector2u(32, 32), level1.map, WIDTH, WIDTH);
 
     int selectedBlock = 0;
 
@@ -745,23 +742,23 @@ void Menu::levelScreen(sf::RenderWindow& window, sf::Clock& clock, Menu menu) {
         }
 
         // обработка нажатий клавиш
-        if (!level1.players.empty()) {
+        if (!level1.enemies.empty()) {
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
-                level1.players[0]->move(Left);
+                level1.enemies[0]->move(Left);
             }
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
-                level1.players[0]->move(Right);
+                level1.enemies[0]->move(Right);
             }
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
-                level1.players[0]->move(Up);
+                level1.enemies[0]->move(Up);
             }
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
-                level1.players[0]->move(Down);
+                level1.enemies[0]->move(Down);
             }
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
-                /*int temp = (level1.players[0]->getPosition());
+                int temp = (Utils::vPos(level1.enemies[0]->getPosition()));
                 if (selectedBlock == 0) map[temp] = selectedBlock;
-                else map[temp] = map[temp] = selectedBlock + 1;*/
+                else map[temp] = selectedBlock + 1;
             }
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z)) {
                 if (delay > 300)
@@ -787,13 +784,15 @@ void Menu::levelScreen(sf::RenderWindow& window, sf::Clock& clock, Menu menu) {
         }
 
         window.clear(sf::Color::Black);
+        level1.translate(map);
+        menuMap.load("images/tileset.png", sf::Vector2u(32, 32), level1.map, WIDTH, WIDTH);
         window.draw(menuMap);
         window.draw(blocksText);
         window.draw(blocks);
         frame.setPosition(673 + selectedBlock * 32, 64);
         window.draw(frame);
 
-        for (auto& p : level1.players) {
+        for (auto& p : level1.enemies) {
             p->update();
             p->draw(window);
         }
@@ -813,7 +812,7 @@ void Menu::fileNameScreen(sf::RenderWindow& window, int* map) {
     titulEnter.setLetterSpacing(2);
     titulEnter.setFillColor(sf::Color::White);
     titulEnter.setPosition(20, 10);
-    sf::Text txtEnter("Press Esc to save and exit.", fontArial, 30);
+    sf::Text txtEnter("Press Enter to save and exit.", fontArial, 30);
     txtEnter.setLetterSpacing(2);
     txtEnter.setFillColor(sf::Color::White);
     txtEnter.setPosition(20, 60);
@@ -841,11 +840,11 @@ void Menu::fileNameScreen(sf::RenderWindow& window, int* map) {
             if (event.type == sf::Event::KeyPressed)
             {
                 if (event.key.code == sf::Keyboard::Return) {
-                    std::stringstream ss(userInput);
+                    std::stringstream aa(userInput);
                     std::vector<std::string> words;
                     std::string word;
 
-                    while (ss >> word) {
+                    while (aa >> word) {
                         words.push_back(word);
                     }
 
@@ -873,7 +872,7 @@ void Menu::fileNameScreen(sf::RenderWindow& window, int* map) {
                     std::stringstream new_line;
                     for (size_t i = 0; i < values.size(); i++) {
                         if (i > 0) {
-                            new_line << ", ";
+                            new_line << ",";
                         }
                         new_line << values[i];
                     }
@@ -884,6 +883,30 @@ void Menu::fileNameScreen(sf::RenderWindow& window, int* map) {
                         outfile << l << std::endl;
                     }
                     outfile.close();
+
+                    /////////////////////////////
+                    std::ifstream infile1(filename);
+                    std::vector<std::string> lines1;
+                    std::string line1;
+                    while (std::getline(infile1, line1)) {
+                        lines1.push_back(line1);
+                    }
+                    infile1.close();
+                    std::stringstream bb;
+                    for (size_t i = 0; i < 441; i++) {
+                        if (i > 0) {
+                            bb << " ";
+                        }
+                        bb << map[i];
+                    }
+                    lines1[6] = bb.str();
+                    std::ofstream outfile1(filename);
+                    for (const auto& l : lines1) {
+                        outfile1 << l << std::endl;
+                    }
+                    outfile1.close();
+
+                    return;
                 }
             }
             if (event.type == sf::Event::TextEntered)
