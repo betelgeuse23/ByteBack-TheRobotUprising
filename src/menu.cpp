@@ -714,7 +714,7 @@ void Menu::levelScreen(sf::RenderWindow& window, sf::Clock& clock, Menu menu) {
 
     TileMap menuMap;
     int map[441] = { 0 };
-    map[0] = 20;
+    map[0] = 45;
     
     Level level1;
     level1.size = sf::Vector2i(WIDTH, WIDTH);

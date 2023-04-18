@@ -188,13 +188,14 @@ public:
         pfE = PathFinder(level, { {0, 1}, {6, 1}, {1, 2}, { 2, 3 } });
         pfEA = PathFinder(level, { {0, 1}, {6, 1}, {1, 2}, { 2, 3 }, { 3, 1 }, { 4, 1 } });
         pfEB = PathFinder(level, { {0, 1}, {6, 1}, {1, 2}, { 2, 3 }, { 3, 1 } });
+        pfA = PathFinder(level, { { 45, 1 } });
     };
     void setCols(sf::Vector2i cols) { colors = cols; };
     void spawn(int*);
 private:
     sf::Vector2i colors = sf::Vector2i(0,0);
     Level* level;
-    PathFinder pfP, pfE, pfEA, pfEB;
+    PathFinder pfP, pfE, pfEA, pfEB, pfA;
 
     void spawnPlayer(int, sf::Vector2i);
     void spawnRobot1(sf::Vector2i);
@@ -202,4 +203,5 @@ private:
     void spawnRobot3(sf::Vector2i);
     void spawnRobot4(sf::Vector2i);
     void spawnRobot5(sf::Vector2i);
+    void spawnCursor(sf::Vector2i pos);
 };

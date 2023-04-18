@@ -133,8 +133,7 @@ Direction PathFinder::pathfind(sf::Vector2i pos, sf::Vector2i dest) {
 bool PathFinder::isAccesible(const Direction dir, const sf::Vector2i pos) {
 	makeCosts(pos, false);
 	sf::Vector2i posN = pos + Utils::makeDir(dir);
-
-	if (posN.x < 0 || posN.y < 0 || posN.x >= level->size.x || posN.y >= level->size.y || !(accesible[posN.x][posN.y])) return false;
+	if (posN.x < 0 || posN.y < 0 || posN.x >= level->size.x || posN.y >= level->size.y || (costs[45] == 0 && !(accesible[posN.x][posN.y]))) return false;
 	return true;
 }
 
@@ -394,6 +393,9 @@ void Spawner::spawn(int* map) {
 			if(colors == sf::Vector2i(0, 0) && p < 1) spawnPlayer(std::rand()%4, sf::Vector2i(j, i));
 			p++;
 			break;
+		case 45:
+			spawnCursor(sf::Vector2i(j, i));
+			break;
 		}
 	}
 }
@@ -463,4 +465,11 @@ void Spawner::spawnRobot5(sf::Vector2i pos) {
 	en->initAnimation({ {Moving, 2} });
 	en->initStats(1, 7, 3, (float)0.1);
 	level->enemies.push_back(en);
+}
+
+void Spawner::spawnCursor(sf::Vector2i pos) {
+	Player* pl = new Player("images/Cursor.png", pos, 1);
+	pl->initPatfind(&pfA);
+	pl->initAnimation({ {Moving, 1} });
+	level->players.push_back(pl);
 }
