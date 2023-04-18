@@ -24,12 +24,12 @@ public:
 	int MoveDown(); 
 	int getSelectedMenuNumber();
 
-	void Options(sf::RenderWindow& window);
+	void Options(sf::RenderWindow& window, sf::Music& mus, struct Options& opts);
 	void Tutorial(sf::RenderWindow& window);
 	bool savingScreen(sf::RenderWindow& window);
 	void winScreen(sf::RenderWindow& window);
 	void loseScreen(sf::RenderWindow& window);
-	void chooseScreen(sf::RenderWindow& window);
+	void chooseScreen(sf::RenderWindow& window, struct Options& opts);
 	void createScreen(sf::RenderWindow& window);
 	void levelScreen(sf::RenderWindow& window, sf::Clock& clock);
 

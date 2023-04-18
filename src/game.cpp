@@ -1,12 +1,12 @@
 #include "game.h"
 
-void Game::startGame(sf::RenderWindow& window, sf::Clock& clock, Menu& menu) {
+void Game::startGame(sf::RenderWindow& window, sf::Clock& clock, Menu& menu, Options& opts) {
     std::srand(time(0));
 
     sf::Music music;
     music.openFromFile("sounds/gameSong.wav");
     music.setLoop(true);
-    music.play();
+    if(opts.music) music.play();
 
     // текстуры
     sf::Texture bulletTexture;
@@ -43,6 +43,7 @@ void Game::startGame(sf::RenderWindow& window, sf::Clock& clock, Menu& menu) {
     level1.translate(lvl);
     Spawner sp(&level1);
     sp.spawn(lvl);
+    if (!opts.sound) level1.pl.off();
 
     // работа с окном
     while (window.isOpen())
@@ -168,7 +169,7 @@ void Game::startGame(sf::RenderWindow& window, sf::Clock& clock, Menu& menu) {
                 file << std::to_string(level) << std::endl;
                 Game game;
                 game.setLevel(level);
-                game.startGame(window, clock, menu);
+                game.startGame(window, clock, menu, opts);
             }
             return;
         }

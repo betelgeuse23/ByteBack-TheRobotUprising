@@ -8,12 +8,14 @@
 #include "Maps.h"
 #include "menu.h"
 #include <fstream>
+#include <sstream>
 
 class Menu;
+struct Options;
 
 class Game {
 public:
-	void startGame(sf::RenderWindow& window, sf::Clock& clock, Menu& menu);
+	void startGame(sf::RenderWindow& window, sf::Clock& clock, Menu& menu, Options& opts);
 	int getLevel() { return level; }
 	void setLevel(int lvl) { level = lvl; }
 private:

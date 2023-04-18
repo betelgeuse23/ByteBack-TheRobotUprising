@@ -233,31 +233,31 @@ void Utils::vecCout(sf::Vector2i size, std::vector<std::vector<int>> vec) {
 void Mpl::playShoot() {
 	sb.loadFromFile("sounds/laserShoot.wav");
 	s = sf::Sound(sb);
-	s.play();
+	if(!offed) s.play();
 }
 
 void Mpl::playHit() {
 	sb.loadFromFile("sounds/hitHurt.wav");
 	s = sf::Sound(sb);
-	s.play();
+	if (!offed) s.play();
 }
 
 void Mpl::playGet() {
 	sb.loadFromFile("sounds/powerUp.wav");
 	s = sf::Sound(sb);
-	s.play();
+	if (!offed) s.play();
 }
 
 void Mpl::playLoose() {
 	sb.loadFromFile("sounds/loose.wav");
 	s = sf::Sound(sb);
-	s.play();
+	if (!offed) s.play();
 }
 
 void Mpl::playWin() {
 	sb.loadFromFile("sounds/win.wav");
 	s = sf::Sound(sb);
-	s.play();
+	if (!offed) s.play();
 }
 
 

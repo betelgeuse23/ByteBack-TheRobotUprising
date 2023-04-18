@@ -32,7 +32,9 @@ public:
     void playGet();
     void playLoose();
     void playWin();
+    void off() { offed = true; };
 private:
+    bool offed = false;
     sf::SoundBuffer sb;
     sf::Sound s;
 };

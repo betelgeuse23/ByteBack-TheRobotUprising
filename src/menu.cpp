@@ -54,7 +54,7 @@ int Menu::MoveDown()
 	return mainMenuSelected;
 }
 
-void Menu::Options(sf::RenderWindow& window) {
+void Menu::Options(sf::RenderWindow& window, sf::Music& mus, struct Options& opts) {
     sf::Clock clock;
     float delay = 0;
 
@@ -62,19 +62,85 @@ void Menu::Options(sf::RenderWindow& window) {
     int map[729] = { 0 };
     menuMap.load("images/tileset.png", sf::Vector2u(32, 32), map, WIDTH + 6, WIDTH);
 
-    while (window.isOpen())
-    {
+    sf::Font fontPixel;
+    fontPixel.loadFromFile("fonts/pixel.ttf");
+    sf::Text titul("Options:", fontPixel, 40);
+    titul.setFillColor(sf::Color::White);
+    titul.setPosition(33, 50);
+
+    sf::Text ok("#", fontPixel, 40);
+
+    sf::String name_lvl[]{ L"Toggle Music", L"Toggle Sound" };
+    Menu menu(window, name_lvl, 2, 96, 128, 25, 32);
+    Game game;
+
+    while (window.isOpen()) {
         sf::Event event;
-        while (window.pollEvent(event))
-        {
-            if (event.type == sf::Event::Closed) window.close();
+
+        float time = clock.getElapsedTime().asMilliseconds();
+        clock.restart();
+        delay += time;
+
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed) { window.close(); }
             if (event.type == sf::Event::KeyPressed)
             {
-                if (event.key.code == sf::Keyboard::Escape) return;
+                if (event.key.code == sf::Keyboard::Escape) {
+                    return;
+                }
+            }
+            if (event.key.code == sf::Keyboard::Up) {
+                if (delay > 300)
+                {
+                    menu.MoveUp();
+                    delay = 0;
+                }
+            }
+            if (event.key.code == sf::Keyboard::Down) {
+                if (delay > 300)
+                {
+                    menu.MoveDown();
+                    delay = 0;
+                }
+            }
+            if (event.key.code == sf::Keyboard::Return)
+            {
+                if (delay > 300) {
+                    delay = 0;
+                    switch (menu.getSelectedMenuNumber()) {
+                    case 0:
+                        opts.music = opts.music ? 0 : 1;
+                        if (opts.music) mus.play();
+                        else mus.stop();
+                        opts.setOpts();
+                        break;
+                    case 1:
+                        opts.sound = opts.sound ? 0 : 1;
+                        opts.setOpts(); 
+                        break;
+                    }
+                }
             }
         }
-        window.clear();
+        
+        window.clear(sf::Color::Black);
         window.draw(menuMap);
+
+        if (opts.music) {
+            if (menu.getSelectedMenuNumber() == 0) ok.setFillColor(sf::Color::Yellow);
+            else ok.setFillColor(sf::Color::White);
+            ok.setPosition(322, 122);
+            window.draw(ok);
+        }
+        if (opts.sound) {
+            if (menu.getSelectedMenuNumber() == 1) ok.setFillColor(sf::Color::Yellow);
+            else ok.setFillColor(sf::Color::White);
+            ok.setPosition(322, 154);
+            window.draw(ok);
+        }
+        
+        menu.draw();
+        window.draw(titul);
         window.display();
     }
 }
@@ -312,7 +378,7 @@ void Menu::loseScreen(sf::RenderWindow& window) {
     }
 }
 
-void Menu::chooseScreen(sf::RenderWindow& window) {
+void Menu::chooseScreen(sf::RenderWindow& window, struct Options& opts) {
     sf::Clock clock;
     float delay = 0;
 
@@ -361,20 +427,19 @@ void Menu::chooseScreen(sf::RenderWindow& window) {
             {
                 if (delay > 300) {
                     delay = 0;
-                switch (menu.getSelectedMenuNumber())
-                {
-                case 0:game.setLevel(1);  game.startGame(window, clock, menu);   break;
-                case 1:game.setLevel(2);  game.startGame(window, clock, menu);   break;
-                case 2:game.setLevel(3);  game.startGame(window, clock, menu);   break;
-                case 3:game.setLevel(4);  game.startGame(window, clock, menu);   break;
-                case 4:game.setLevel(5);  game.startGame(window, clock, menu);   break;
-                case 5:game.setLevel(6);  game.startGame(window, clock, menu);   break;
-                case 6:game.setLevel(7);  game.startGame(window, clock, menu);   break;
-                case 7:game.setLevel(8);  game.startGame(window, clock, menu);   break;
-                case 8:game.setLevel(9);  game.startGame(window, clock, menu);   break;
-                case 9:game.setLevel(10);  game.startGame(window, clock, menu);   break;
+                    switch (menu.getSelectedMenuNumber()) {
+                        case 0:game.setLevel(1);  game.startGame(window, clock, menu, opts);   break;
+                        case 1:game.setLevel(2);  game.startGame(window, clock, menu, opts);   break;
+                        case 2:game.setLevel(3);  game.startGame(window, clock, menu, opts);   break;
+                        case 3:game.setLevel(4);  game.startGame(window, clock, menu, opts);   break;
+                        case 4:game.setLevel(5);  game.startGame(window, clock, menu, opts);   break;
+                        case 5:game.setLevel(6);  game.startGame(window, clock, menu, opts);   break;
+                        case 6:game.setLevel(7);  game.startGame(window, clock, menu, opts);   break;
+                        case 7:game.setLevel(8);  game.startGame(window, clock, menu, opts);   break;
+                        case 8:game.setLevel(9);  game.startGame(window, clock, menu, opts);   break;
+                        case 9:game.setLevel(10);  game.startGame(window, clock, menu, opts);   break;
+                    }
                 }
-            }
             }
         }
         window.clear(sf::Color::Black);
