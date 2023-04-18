@@ -154,7 +154,7 @@ private:
     int lives = 5;
     int damage = 1;
     int rate = 1000;
-    Effects effect = Effects(5);
+    Effects effect = Effects(6);
 
     bool isCharged();
 };

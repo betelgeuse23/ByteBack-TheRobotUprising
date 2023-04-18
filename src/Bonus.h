@@ -6,7 +6,7 @@
 struct Level;
 
 enum Effects {
-	Health, Speed, Rate, Shield, Damage, Spare
+	Health, Speed, Rate, Shield, Damage, Stan, Spare
 };
 
 class Bonus {

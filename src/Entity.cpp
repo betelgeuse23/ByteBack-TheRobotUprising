@@ -276,10 +276,14 @@ void Enemy::update() {
 
 
 bool Player::doDamage(int dmg) {
-	if (effect != Shield || dmg < 0) {
-		lives = std::max(0, lives - std::abs(dmg));
+	if (dmg == -1) affect(Stan);
+	if (dmg == -5) lives = 0;
+
+	if (effect != Shield && dmg > 0) {
+		lives = std::max(0, lives - dmg);
 		setPosition(spawn);
 	}
+	
 	if (lives == 0) state = Dead;
 	return state != Dead;
 }
@@ -301,6 +305,8 @@ void Player::affect(Effects eff) {
 		if(lives < 5) lives++;
 		effect = Spare;
 	}
+
+	if(eff == Stan) speed = 0;
 }
 
 void Player::update() {
@@ -404,7 +410,7 @@ void Spawner::spawnRobot4(sf::Vector2i pos) {
 	en->initPatfind(&pfEA);
 	en->makeTarget();
 	en->initAnimation({ {Moving, 8} });
-	en->initStats(1, 20, 1, (float)0.15);
+	en->initStats(1, 20, -1, (float)0.15);
 	level->enemies.push_back(en);
 }
 

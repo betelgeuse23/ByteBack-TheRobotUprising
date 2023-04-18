@@ -10,11 +10,10 @@ void Game::startGame(sf::RenderWindow& window, sf::Clock& clock, Menu& menu) {
     bulletSprite.setTexture(bulletTexture);
     bulletSprite.setTextureRect(sf::IntRect(0, 0, 31, 31));
 
-    sf::Texture shieldTexture;
-    shieldTexture.loadFromFile("images/shield.png");
-    sf::Sprite shieldSprite;
-    shieldSprite.setTexture(shieldTexture);
-    shieldSprite.setTextureRect(sf::IntRect(0, 0, 31, 31));
+    sf::Texture effectTexture;
+    effectTexture.loadFromFile("images/effects.png");
+    sf::Sprite effectSprite;
+    effectSprite.setTexture(effectTexture);
 
     sf::Texture heartTexture;
     heartTexture.loadFromFile("images/bonusesbig.png");
@@ -104,10 +103,10 @@ void Game::startGame(sf::RenderWindow& window, sf::Clock& clock, Menu& menu) {
         for (auto& p : level1.players) {
             p->update();
             p->draw(window);
-            if (p->getEffect() == Shield) {
-                shieldSprite.setPosition(p->getSpritePosition());
-                shieldSprite.setTextureRect(sf::IntRect(32*(std::rand()%4), 0, 31, 31));
-                window.draw(shieldSprite);
+            if (p->getEffect() != Spare) {
+                effectSprite.setTextureRect(sf::IntRect(32 * (std::rand() % 4), 32 * (p->getEffect() - 1), 31, 31));
+                effectSprite.setPosition(p->getSpritePosition());
+                window.draw(effectSprite);
             }
         }
 
