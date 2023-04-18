@@ -236,7 +236,7 @@ bool Enemy::doDamage(int d) {
 	health = std::max(0, health - d);
 	if (health == 0) {
 		state = Dead;
-		int b = rand() % 10;
+		int b = rand() % 8;
 		if(b < 5) pf->getLevel()->bonuses.push_back(new Bonus(Effects(b), position));
 	}
 	return state != Dead;
@@ -320,6 +320,7 @@ void Player::shoot(Level* level) {
 }
 
 
+
 void Spawner::spawn(int* map) {
 	sf::Vector2i size = level->size;
 	for (int i = 0, t = 0; i < size.x; i++) for (int j = 0; j < size.y; j++, t++) {
@@ -340,7 +341,7 @@ void Spawner::spawn(int* map) {
 			spawnRobot5(sf::Vector2i(j, i));
 			break;
 		case 20:
-			spawnPlayer(0,sf::Vector2i(j, i));
+			spawnPlayer(1,sf::Vector2i(j, i));
 			break;
 		}
 	}
@@ -350,16 +351,16 @@ void Spawner::spawnPlayer(int col, sf::Vector2i pos) {
 	std::string str;
 	switch (col) {
 	case 1:
-		str = "images/character1.png";
+		str = "images/player1.png";
 		break;
 	case 2:
-		str = "images/character2.png";
+		str = "images/player2.png";
 		break;
 	case 3:
-		str = "images/character3.png";
+		str = "images/player3.png";
 		break;
 	case 4:
-		str = "images/character4.png";
+		str = "images/player4.png";
 		break;
 	default:
 		str = "images/character.png";
@@ -367,6 +368,7 @@ void Spawner::spawnPlayer(int col, sf::Vector2i pos) {
 	}
 	Player* pl = new Player(str, pos);
 	pl->initPatfind(&pfP);
+	pl->initAnimation({ {Moving, 2} });
 	level->players.push_back(pl);
 }
 
@@ -374,17 +376,17 @@ void Spawner::spawnRobot1(sf::Vector2i pos) {
 	Enemy* en = new Enemy("images/robot1.png", pos);
 	en->initPatfind(&pfE);
 	en->makeTarget();
-	en->initAnimation({ {Moving, 1} });
-	en->initStats(1, 15, 1, (float)0.2);
+	en->initAnimation({ {Moving, 4} });
+	en->initStats(1, 5, 1, (float)0.1);
 	level->enemies.push_back(en);
 }
 
 void Spawner::spawnRobot2(sf::Vector2i pos) {
 	Enemy* en = new Enemy("images/robot2.png", pos);
-	en->initPatfind(&pfE);
+	en->initPatfind(&pfEB);
 	en->makeTarget();
 	en->initAnimation({ {Moving, 4} });
-	en->initStats(2, 10, 1, (float)0.1);
+	en->initStats(1, 15, 1, (float)0.1);
 	level->enemies.push_back(en);
 }
 
@@ -392,17 +394,17 @@ void Spawner::spawnRobot3(sf::Vector2i pos) {
 	Enemy* en = new Enemy("images/robot3.png", pos);
 	en->initPatfind(&pfE);
 	en->makeTarget();
-	en->initAnimation({ {Moving, 1} });
-	en->initStats(2, 5, 3, (float)0.05);
+	en->initAnimation({ {Moving, 4} });
+	en->initStats(2, 7, 1, (float)0.05);
 	level->enemies.push_back(en);
 }
 
 void Spawner::spawnRobot4(sf::Vector2i pos) {
 	Enemy* en = new Enemy("images/robot4.png", pos);
-	en->initPatfind(&pfE);
+	en->initPatfind(&pfEA);
 	en->makeTarget();
-	en->initAnimation({ {Moving, 1} });
-	en->initStats(1, 7, 2, (float)0.15);
+	en->initAnimation({ {Moving, 8} });
+	en->initStats(1, 20, 1, (float)0.15);
 	level->enemies.push_back(en);
 }
 
@@ -410,7 +412,7 @@ void Spawner::spawnRobot5(sf::Vector2i pos) {
 	Enemy* en = new Enemy("images/robot5.png", pos);
 	en->initPatfind(&pfE);
 	en->makeTarget();
-	en->initAnimation({ {Moving, 1} });
-	en->initStats(2, 20, 1, (float)0.1);
+	en->initAnimation({ {Moving, 2} });
+	en->initStats(1, 7, 3, (float)0.1);
 	level->enemies.push_back(en);
 }

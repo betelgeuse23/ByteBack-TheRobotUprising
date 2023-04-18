@@ -25,15 +25,15 @@ bool Bullet::checkCollisions(Level* level) {
 
 	if (!(players) && !(level->players.empty()))
 		for (auto& p : level->players)
-			if (p->getPosition() == globalPos) {
+			if (Utils::gPos(p->getSpritePosition()) == globalPos) {
 				p->doDamage(1);
 				return true;
 			}
 
 	if (players && !(level->enemies.empty()))
-		for (auto& enemy : level->enemies)
-			if (enemy->getPosition() == globalPos) {
-				enemy->doDamage(1);
+		for (auto& e : level->enemies)
+			if (Utils::gPos(e->getSpritePosition()) == globalPos) {
+				e->doDamage(1);
 				return true;
 			}
 

@@ -164,12 +164,14 @@ class Spawner {
 public:
     Spawner(Level* level) : level(level) {
         pfP = PathFinder(level, { {0, 1}, {4, 1}, {6, 1} });
-        pfE = PathFinder(level, { {0, 1}, {6, 1}, {1, 2}, { 2, 3 }, { 3, 1 } });
+        pfE = PathFinder(level, { {0, 1}, {6, 1}, {1, 2}, { 2, 3 } });
+        pfEA = PathFinder(level, { {0, 1}, {6, 1}, {1, 2}, { 2, 3 }, { 3, 1 }, { 4, 1 } });
+        pfEB = PathFinder(level, { {0, 1}, {6, 1}, {1, 2}, { 2, 3 }, { 3, 1 } });
     };
     void spawn(int*);
 private:
     Level* level;
-    PathFinder pfP, pfE;
+    PathFinder pfP, pfE, pfEA, pfEB;
 
     void spawnPlayer(int, sf::Vector2i);
     void spawnRobot1(sf::Vector2i);
