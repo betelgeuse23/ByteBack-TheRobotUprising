@@ -23,6 +23,7 @@ public:
 	int MoveUp();
 	int MoveDown(); 
 	int getSelectedMenuNumber();
+	void updateText(sf::String name[]);
 
 	void ColorChoose(sf::RenderWindow& window, struct Options& opts);
 	void Options(sf::RenderWindow& window, sf::Music& mus, struct Options& opts);

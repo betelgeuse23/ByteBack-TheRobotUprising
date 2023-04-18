@@ -179,11 +179,7 @@ void Game::startGame(sf::RenderWindow& window, sf::Clock& clock, Menu& menu, Opt
         if (level1.enemies.empty()) {
             music.stop();
             level1.pl.playWin();
-            if (opts.external) {
-                menu.winScreen(window);
-                delete opts.external;
-                opts.external = nullptr;
-            }
+            if (opts.external) { menu.winScreen(window); }
             else {
                 if (level == 10) {
                     level = 1;

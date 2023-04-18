@@ -8,7 +8,12 @@ Menu::Menu(sf::RenderWindow& window, sf::String name[], int itm, int xpos, int y
     for (int i = 0; i < items; i++, yposition += distance)
         if (i == 0) setInitText(mainMenu[i], name[i], xposition, yposition, 1);
         else setInitText(mainMenu[i], name[i], xposition, yposition, 0);
-	mainMenuSelected = 0; 
+	mainMenuSelected = 0;
+}
+
+void Menu::updateText(sf::String name[]) {
+    for (int i = 0; i < items; i++)
+        mainMenu[i].setString(name[i]);
 }
 
 void Menu::setInitText(sf::Text& text, sf::String str, float xpos, float ypos, bool first)
@@ -584,16 +589,16 @@ void Menu::chooseScreen(sf::RenderWindow& window, struct Options& opts) {
                 if (delay > 300) {
                     delay = 0;
                     switch (menu.getSelectedMenuNumber()) {
-                        case 0:game.setLevel(1);  game.startGame(window, clock, menu, opts, 1);   break;
-                        case 1:game.setLevel(2);  game.startGame(window, clock, menu, opts, 1);   break;
-                        case 2:game.setLevel(3);  game.startGame(window, clock, menu, opts, 1);   break;
-                        case 3:game.setLevel(4);  game.startGame(window, clock, menu, opts, 1);   break;
-                        case 4:game.setLevel(5);  game.startGame(window, clock, menu, opts, 1);   break;
-                        case 5:game.setLevel(6);  game.startGame(window, clock, menu, opts, 1);   break;
-                        case 6:game.setLevel(7);  game.startGame(window, clock, menu, opts, 1);   break;
-                        case 7:game.setLevel(8);  game.startGame(window, clock, menu, opts, 1);   break;
-                        case 8:game.setLevel(9);  game.startGame(window, clock, menu, opts, 1);   break;
-                        case 9:game.setLevel(10);  game.startGame(window, clock, menu, opts, 1);   break;
+                        case 0:game.setLevel(1);  game.startGame(window, clock, menu, opts);   break;
+                        case 1:game.setLevel(2);  game.startGame(window, clock, menu, opts);   break;
+                        case 2:game.setLevel(3);  game.startGame(window, clock, menu, opts);   break;
+                        case 3:game.setLevel(4);  game.startGame(window, clock, menu, opts);   break;
+                        case 4:game.setLevel(5);  game.startGame(window, clock, menu, opts);   break;
+                        case 5:game.setLevel(6);  game.startGame(window, clock, menu, opts);   break;
+                        case 6:game.setLevel(7);  game.startGame(window, clock, menu, opts);   break;
+                        case 7:game.setLevel(8);  game.startGame(window, clock, menu, opts);   break;
+                        case 8:game.setLevel(9);  game.startGame(window, clock, menu, opts);   break;
+                        case 9:game.setLevel(10);  game.startGame(window, clock, menu, opts);   break;
                     }
                 }
             }
@@ -659,34 +664,42 @@ void Menu::createScreen(sf::RenderWindow& window, struct Options& opts) {
                 if (event.key.code == sf::Keyboard::Escape) return;
             }
             if (event.key.code == sf::Keyboard::Up) {
-                if (delay > 300)
-                {
+                if (delay > 300) {
                     menu.MoveUp();
                     delay = 0;
                 }
             }
             if (event.key.code == sf::Keyboard::Down) {
-                if (delay > 300)
-                {
+                if (delay > 300) {
                     menu.MoveDown();
                     delay = 0;
                 }
             }
             if (event.key.code == sf::Keyboard::Return)
             {
-                switch (menu.getSelectedMenuNumber()) {
-                    case 0: 
-                        game.setLevel(0);
-                        game.startGame(window, clock, menu, opts, 1);
-                    case 1: 
-                        game.setLevel(0);
-                        game.startGame(window, clock, menu, opts, 1);
-                    case 2: 
-                        game.setLevel(0);
-                        game.startGame(window, clock, menu, opts, 1);
-                    case 3: 
+                if (delay > 300) {
+                    switch (menu.getSelectedMenuNumber()) {
+                    case 3:
                         menu.levelScreen(window, clock);
-                    break;
+                        break;
+                    default:
+                        std::string filename = "save.txt";
+                        std::ifstream infile(filename);
+                        std::vector<std::string> lines;
+                        std::string line;
+                        while (std::getline(infile, line)) { lines.push_back(line); }
+                        infile.close();
+                        std::stringstream ss(lines[6+menu.getSelectedMenuNumber()]);
+                        std::string num_str;
+                        std::vector<int> nums;
+                        while (std::getline(ss, num_str, ',')) { nums.push_back(std::stoi(num_str)); }
+                        int arr[441];
+                        for (size_t i = 0; i < nums.size(); i++) { arr[i] = nums[i]; }
+                        opts.external = arr;
+                        game.startGame(window, clock, menu, opts);
+                        opts.external = nullptr;
+                        break;
+                    }
                 }
             }
         }
@@ -699,7 +712,7 @@ void Menu::createScreen(sf::RenderWindow& window, struct Options& opts) {
 }
 
 void Menu::levelScreen(sf::RenderWindow& window, sf::Clock& clock) {
-    std::map<int, int> block = { {0,0},{1,1},{2,2},{3,3},{4,4}, {5,5}, {6,11}, {7,12}, {8,13}, {9,14}, {10,15},{11,20} };
+    std::map<int, int> block = { {0,0},{1,2},{2,3},{3,4},{4,5}, {5,6}, {6,11}, {7,12}, {8,13}, {9,14}, {10,15},{11,20} };
     float delay = 0;
 
     sf::Font font;
@@ -905,7 +918,7 @@ void Menu::fileNameScreen(sf::RenderWindow& window, int* map) {
                         }
                         bb << map[i];
                     }
-                    lines1[6] = bb.str();
+                    lines1[6 + (int)words[0][0] - (int)'0' - 1] = bb.str();
                     std::ofstream outfile1(filename);
                     for (const auto& l : lines1) {
                         outfile1 << l << std::endl;

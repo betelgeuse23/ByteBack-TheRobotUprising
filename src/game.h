@@ -15,7 +15,7 @@ struct Options;
 
 class Game {
 public:
-	void startGame(sf::RenderWindow& window, sf::Clock& clock, Menu& menu, Options& opts, bool usr);
+	void startGame(sf::RenderWindow& window, sf::Clock& clock, Menu& menu, Options& opts);
 	int getLevel() { return level; }
 	void setLevel(int lvl) { level = lvl; }
 private:

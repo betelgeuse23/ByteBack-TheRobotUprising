@@ -73,7 +73,7 @@ int main() {
                 case 1: {
                     music.pause();
                     game.setLevel(opts.level);
-                    game.startGame(window, clock, menu, opts, 0);
+                    game.startGame(window, clock, menu, opts);
                     if (opts.music) music.play();
                     break;
                 }
