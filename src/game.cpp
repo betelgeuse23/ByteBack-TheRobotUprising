@@ -16,7 +16,7 @@ void Game::startGame(sf::RenderWindow& window, sf::Clock& clock, Menu& menu) {
     effectSprite.setTexture(effectTexture);
 
     sf::Texture heartTexture;
-    heartTexture.loadFromFile("images/bonusesbig.png");
+    heartTexture.loadFromFile("images/hearts.png");
     sf::Sprite heartSprite;
     heartSprite.setTexture(heartTexture);
     heartSprite.setTextureRect(sf::IntRect(0, 0, 95, 95));
@@ -59,20 +59,39 @@ void Game::startGame(sf::RenderWindow& window, sf::Clock& clock, Menu& menu) {
         }
 
         // обработка нажатий клавиш
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
-            level1.players[0]->move(Left);
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
-            level1.players[0]->move(Right);
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
-            level1.players[0]->move(Up);
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
-            level1.players[0]->move(Down);
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
-            level1.players[0]->shoot(&level1);
+        if (!level1.players.empty()) {
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
+                level1.players[0]->move(Left);
+            }
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
+                level1.players[0]->move(Right);
+            }
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
+                level1.players[0]->move(Up);
+            }
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
+                level1.players[0]->move(Down);
+            }
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
+                level1.players[0]->shoot(&level1);
+            }
+            if (level1.players.size() == 2) {
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
+                    level1.players[1]->move(Left);
+                }
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+                    level1.players[1]->move(Right);
+                }
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
+                    level1.players[1]->move(Up);
+                } 
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
+                    level1.players[1]->move(Down);
+                }
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) {
+                    level1.players[1]->shoot(&level1);
+                }
+            }
         }
 
         window.clear(sf::Color::Black);
@@ -81,6 +100,7 @@ void Game::startGame(sf::RenderWindow& window, sf::Clock& clock, Menu& menu) {
 
         level1.bullets.erase(std::remove_if(level1.bullets.begin(), level1.bullets.end(), [&level1](Bullet* ptr) { return ptr->checkCollisions(&level1); }), level1.bullets.end());
         level1.enemies.erase(std::remove_if(level1.enemies.begin(), level1.enemies.end(), [](Enemy* ptr) { return ptr->getState() == Dead; }), level1.enemies.end());
+        level1.players.erase(std::remove_if(level1.players.begin(), level1.players.end(), [](Player* ptr) { return ptr->getState() == Dead; }), level1.players.end());
         level1.bonuses.erase(std::remove_if(level1.bonuses.begin(), level1.bonuses.end(), [&level1](Bonus* ptr) { return ptr->checkCollisions(&level1); }), level1.bonuses.end());
 
         map.load("images/tileset.png", sf::Vector2u(cell, cell), level1.map, WIDTH, WIDTH);
@@ -100,14 +120,21 @@ void Game::startGame(sf::RenderWindow& window, sf::Clock& clock, Menu& menu) {
             }
         }
 
+        int hI = 0;
         for (auto& p : level1.players) {
             p->update();
-            p->draw(window);
+            if(p->getState() != Dead) p->draw(window);
             if (p->getEffect() != Spare) {
                 effectSprite.setTextureRect(sf::IntRect(32 * (std::rand() % 4), 32 * (p->getEffect() - 1), 31, 31));
                 effectSprite.setPosition(p->getSpritePosition());
                 window.draw(effectSprite);
             }
+            for (int i = 0; i < p->getLives(); i++) {
+                heartSprite.setTextureRect(sf::IntRect(p->getColor() * 95, 0, 95, 95));
+                heartSprite.setPosition(620 + (i + 1) * 32, 20 + 95 * hI);
+                window.draw(heartSprite);
+            }
+            hI++;
         }
 
         for (auto& b : level1.bullets) {
@@ -116,14 +143,11 @@ void Game::startGame(sf::RenderWindow& window, sf::Clock& clock, Menu& menu) {
             window.draw(bulletSprite);
         }
 
-        for (int i = 0; i < level1.players[0]->getLives(); i++) {
-            heartSprite.setPosition(620 + (i + 1) * 32, 20);
-            window.draw(heartSprite);
-        }
-        if (level1.players[0]->getLives() == 0) {
+        if (level1.players.empty()) {
             menu.loseScreen(window);
             return;
         }
+
         if (level1.enemies.empty()) {
             if (level == 10) {
                 level = 1;

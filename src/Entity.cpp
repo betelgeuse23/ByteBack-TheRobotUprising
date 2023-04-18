@@ -280,7 +280,7 @@ bool Player::doDamage(int dmg) {
 	if (dmg == -5) lives = 0;
 
 	if (effect != Shield && dmg > 0) {
-		lives = std::max(0, lives - dmg);
+		lives = std::max(0, lives - 1);
 		setPosition(spawn);
 	}
 	
@@ -347,7 +347,7 @@ void Spawner::spawn(int* map) {
 			spawnRobot5(sf::Vector2i(j, i));
 			break;
 		case 20:
-			spawnPlayer(1,sf::Vector2i(j, i));
+			spawnPlayer(std::rand()%4, sf::Vector2i(j, i));
 			break;
 		}
 	}
@@ -356,23 +356,20 @@ void Spawner::spawn(int* map) {
 void Spawner::spawnPlayer(int col, sf::Vector2i pos) {
 	std::string str;
 	switch (col) {
-	case 1:
+	case 0:
 		str = "images/player1.png";
 		break;
-	case 2:
+	case 1:
 		str = "images/player2.png";
 		break;
-	case 3:
+	case 2:
 		str = "images/player3.png";
 		break;
-	case 4:
+	case 3:
 		str = "images/player4.png";
 		break;
-	default:
-		str = "images/character.png";
-		break;
 	}
-	Player* pl = new Player(str, pos);
+	Player* pl = new Player(str, pos, col);
 	pl->initPatfind(&pfP);
 	pl->initAnimation({ {Moving, 2} });
 	level->players.push_back(pl);

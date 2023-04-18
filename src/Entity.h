@@ -133,7 +133,7 @@ private:
 
 class Player : public Entity {
 public:
-    Player(std::string str, sf::Vector2i pos) : Entity(str, pos), spawn(pos) { speed = (float)0.2; animations = { {Moving, 2} }; };
+    Player(std::string str, sf::Vector2i pos, int col) : Entity(str, pos), spawn(pos), color(col) { speed = (float)0.2; animations = { {Moving, 2} }; };
     bool doDamage(int);
 
     int getLives() { return lives; };
@@ -145,8 +145,10 @@ public:
 
     void affect(Effects);
     Effects getEffect() { return effect; };
+    int getColor() { return color; };
     void setSpawn(sf::Vector2i s) { spawn = s; };
 private:
+    int color;
     sf::Clock bonus;
     sf::Clock fire;
     bool charge;
