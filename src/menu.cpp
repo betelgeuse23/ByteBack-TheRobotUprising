@@ -676,7 +676,7 @@ void Menu::createScreen(sf::RenderWindow& window) {
             {
                 switch (menu.getSelectedMenuNumber())
                 {
-                case 3: menu.levelScreen(window, clock); break;
+                case 3: menu.levelScreen(window, clock, menu); break;
                 }
             }
         }
@@ -688,7 +688,7 @@ void Menu::createScreen(sf::RenderWindow& window) {
     }
 }
 
-void Menu::levelScreen(sf::RenderWindow& window, sf::Clock& clock) {
+void Menu::levelScreen(sf::RenderWindow& window, sf::Clock& clock, Menu menu) {
     std::srand(time(0));
     float delay = 0;
 
@@ -706,6 +706,12 @@ void Menu::levelScreen(sf::RenderWindow& window, sf::Clock& clock) {
     blocks.setTexture(blocksTexture);
     blocks.setPosition(673, 64);
 
+    sf::Texture frameTexture;
+    frameTexture.loadFromFile("images/frame.png");
+    sf::Sprite frame;
+    frame.setTexture(frameTexture);
+    frame.setPosition(673, 64);
+
     TileMap menuMap;
     int map[441] = { 0 };
     map[0] = 20;
@@ -718,25 +724,23 @@ void Menu::levelScreen(sf::RenderWindow& window, sf::Clock& clock) {
 
     menuMap.load("images/tileset.png", sf::Vector2u(32, 32), level1.map, WIDTH, WIDTH);
 
-    sf::String lvlBlocks[6] = { "0", "1", "2", "3", "4", "5"};
-    Menu menu(window, lvlBlocks, 4, 96, 128, 25, 32);
+    int selectedBlock = 0;
 
     // работа с окном
     while (window.isOpen())
     {
+        sf::Event event;
         float time = clock.getElapsedTime().asMilliseconds();
         clock.restart();
+        delay += time;
 
-        sf::Event event;
         while (window.pollEvent(event))
         {
             if (event.type == sf::Event::Closed) window.close();
             if (event.type == sf::Event::KeyPressed)
             {
                 // Закрываем окно
-                if (event.key.code == sf::Keyboard::Escape) {
-                    if (menu.savingScreen(window)) return;
-                }
+                if (event.key.code == sf::Keyboard::Escape) return;
             }
         }
 
@@ -755,7 +759,30 @@ void Menu::levelScreen(sf::RenderWindow& window, sf::Clock& clock) {
                 level1.players[0]->move(Down);
             }
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
-                level1.players[0]->shoot(&level1);
+                /*int temp = (level1.players[0]->getPosition());
+                if (selectedBlock == 0) map[temp] = selectedBlock;
+                else map[temp] = map[temp] = selectedBlock + 1;*/
+            }
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z)) {
+                if (delay > 300)
+                {
+                    (selectedBlock == 0) ? selectedBlock = 5 : selectedBlock--;
+                    delay = 0;
+                }
+            }
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::X)) {
+                if (delay > 300)
+                {
+                    (selectedBlock == 5) ? selectedBlock = 0 : selectedBlock++;
+                    delay = 0;
+                }
+            }
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Return)) {
+                if (delay > 300)
+                {
+                    fileNameScreen(window, map);
+                    delay = 0;
+                }
             }
         }
 
@@ -763,12 +790,123 @@ void Menu::levelScreen(sf::RenderWindow& window, sf::Clock& clock) {
         window.draw(menuMap);
         window.draw(blocksText);
         window.draw(blocks);
+        frame.setPosition(673 + selectedBlock * 32, 64);
+        window.draw(frame);
 
         for (auto& p : level1.players) {
             p->update();
             p->draw(window);
         }
 
+        window.display();
+    }
+}
+
+void Menu::fileNameScreen(sf::RenderWindow& window, int* map) {
+   
+    sf::Font fontPixel;
+    fontPixel.loadFromFile("fonts/pixel.ttf");
+    sf::Font fontArial;
+    fontArial.loadFromFile("fonts/arial.ttf");
+
+    sf::Text titulEnter("Write file name", fontPixel, 50);
+    titulEnter.setLetterSpacing(2);
+    titulEnter.setFillColor(sf::Color::White);
+    titulEnter.setPosition(20, 10);
+    sf::Text txtEnter("Press Esc to save and exit.", fontArial, 30);
+    txtEnter.setLetterSpacing(2);
+    txtEnter.setFillColor(sf::Color::White);
+    txtEnter.setPosition(20, 60);
+
+    sf::RectangleShape inputBox(sf::Vector2f(200, 30));
+    inputBox.setFillColor(sf::Color::White);
+    inputBox.setOutlineThickness(2);
+    inputBox.setOutlineColor(sf::Color::Black);
+    inputBox.setPosition(300, 300);
+
+    sf::Text inputText;
+    inputText.setFont(fontArial);
+    inputText.setCharacterSize(20);
+    inputText.setFillColor(sf::Color::Black);
+    inputText.setPosition(310, 305);
+
+    std::string userInput;
+
+    while (window.isOpen())
+    {
+        sf::Event event;
+        while (window.pollEvent(event))
+        {
+            if (event.type == sf::Event::Closed);
+            if (event.type == sf::Event::KeyPressed)
+            {
+                if (event.key.code == sf::Keyboard::Return) {
+                    std::stringstream ss(userInput);
+                    std::vector<std::string> words;
+                    std::string word;
+
+                    while (ss >> word) {
+                        words.push_back(word);
+                    }
+
+                    for (const auto& w : words) {
+                        std::cout << w << std::endl;
+                    }
+
+                    std::string filename = "save.txt"; 
+                    std::ifstream infile(filename);
+                    std::vector<std::string> lines;
+                    std::string line;
+                    while (std::getline(infile, line)) {
+                        lines.push_back(line);
+                    }
+                    infile.close();
+                    std::string& fourth_line = lines[3];
+                    std::stringstream ss(fourth_line);
+                    std::vector<std::string> values;
+                    std::string value;
+                    while (std::getline(ss, value, ',')) {
+                        values.push_back(value);
+                    }
+                    values[std::stoi(words[0])] = words[1];
+
+                    std::stringstream new_line;
+                    for (size_t i = 0; i < values.size(); i++) {
+                        if (i > 0) {
+                            new_line << ", ";
+                        }
+                        new_line << values[i];
+                    }
+                    fourth_line = new_line.str();
+                    std::ofstream outfile(filename);
+
+                    for (const auto& l : lines) {
+                        outfile << l << std::endl;
+                    }
+                    outfile.close();
+                }
+            }
+            if (event.type == sf::Event::TextEntered)
+            {
+                if (event.text.unicode < 128)
+                {
+                    if (event.text.unicode == '\b' && userInput.size() > 0)
+                    {
+                        userInput.pop_back();
+                    }
+                    else if (event.text.unicode != '\b')
+                    {
+                        userInput += static_cast<char>(event.text.unicode);
+                    }
+                    inputText.setString(userInput);
+                }
+            }
+        }
+        window.clear();
+        window.draw(titulEnter);
+        window.draw(txtEnter);
+        window.draw(inputBox);
+        window.draw(inputText);
         window.display();
     }
 }
