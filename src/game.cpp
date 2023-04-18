@@ -38,6 +38,7 @@ void Game::startGame(sf::RenderWindow& window, sf::Clock& clock, Menu& menu, Opt
     healthText.setPosition(680, 10);
 
     int* lvl = Map::getMap(level);
+    if(opts.external) lvl = opts.external;
     TileMap map;
 
     Level level1;
@@ -178,17 +179,24 @@ void Game::startGame(sf::RenderWindow& window, sf::Clock& clock, Menu& menu, Opt
         if (level1.enemies.empty()) {
             music.stop();
             level1.pl.playWin();
-            if (level == 10) {
-                level = 1;
+            if (opts.external) {
                 menu.winScreen(window);
+                delete opts.external;
+                opts.external = nullptr;
             }
             else {
-                level++;
-                opts.level = level;
-                opts.setOpts();
-                Game game;
-                game.setLevel(level);
-                game.startGame(window, clock, menu, opts);
+                if (level == 10) {
+                    level = 1;
+                    menu.winScreen(window);
+                }
+                else {
+                    level++;
+                    opts.level = level;
+                    opts.setOpts();
+                    Game game;
+                    game.setLevel(level);
+                    game.startGame(window, clock, menu, opts);
+                }
             }
             opts.cols = sf::Vector2i(0, 0);
             return;

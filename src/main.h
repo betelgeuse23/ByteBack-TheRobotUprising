@@ -14,6 +14,7 @@ struct Options {
 	int level = 1;
 	int players = 1;
 	sf::Vector2i cols = sf::Vector2i(0, 0);
+	int* external = nullptr;
 	void getOpts() {
 		std::ifstream file("save.txt");
 		std::string line;
