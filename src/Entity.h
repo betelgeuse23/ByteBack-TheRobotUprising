@@ -22,6 +22,7 @@ class Enemy;
 class Player;
 class Bonus;
 class Bullet;
+class Spawner;
 enum Effects;
 
 struct Level {
@@ -40,12 +41,16 @@ struct Level {
     }
     void translate(int* mapT) {
         map = std::vector<std::vector<int>>(size.x, std::vector<int>(size.y));
-        for (int i = 0, t = 0; i < size.x; i++) for (int j = 0; j < size.y; j++) map[j][i] = mapT[t++];
+        for (int i = 0, t = 0; i < size.x; i++) for (int j = 0; j < size.y; j++, t++) {
+            map[j][i] = mapT[t]<9?mapT[t]:0;
+            if (mapT[t] == 6) base = sf::Vector2i(j, i);
+        }
     }
 };
 
 class PathFinder {
 public:
+    PathFinder() = default;
     PathFinder(Level* level, std::map<int, int> costs)
         : level(level), accesible(std::vector<std::vector<int>>(level->size.x, std::vector<int>(level->size.y))), costs(costs), matrix(std::vector<std::vector<int>>(level->size.x, std::vector<int>(level->size.y))) {};
 
@@ -111,9 +116,9 @@ public:
 
 class Enemy : public Entity {
 public:
-    Enemy(std::string str, sf::Vector2i pos) : Entity(str, pos) { animations = { {Moving, 4} }; };
+    Enemy(std::string str, sf::Vector2i pos) : Entity(str, pos) {};
     void makeTarget() { target = pf->getLevel()->base; }
-    void initStats(int, int, float);
+    void initStats(int, int, int, float);
     bool doDamage(int);
     void shoot(Level*, Direction);
     void update();
@@ -122,12 +127,13 @@ private:
     sf::Vector2i target;
     sf::Clock fire;
     int health = 1;
+    int damage = 1;
     int range = 10;
 };
 
 class Player : public Entity {
 public:
-    Player(std::string str, sf::Vector2i pos) : Entity(str, pos), spawn(pos) { speed = (float)0.2; animations = { {Moving, 2} }; };
+    Player(std::string str, sf::Vector2i pos, int col) : Entity(str, pos), spawn(pos), color(col) { speed = (float)0.2; animations = { {Moving, 2} }; };
     bool doDamage(int);
 
     int getLives() { return lives; };
@@ -138,11 +144,11 @@ public:
     void shoot(Level*);
 
     void affect(Effects);
-
-    bool isCharged();
-    bool isShielded() { return effect == Effects(3); };
+    Effects getEffect() { return effect; };
+    int getColor() { return color; };
     void setSpawn(sf::Vector2i s) { spawn = s; };
 private:
+    int color;
     sf::Clock bonus;
     sf::Clock fire;
     bool charge;
@@ -150,5 +156,29 @@ private:
     int lives = 5;
     int damage = 1;
     int rate = 1000;
-    Effects effect = Effects(5);
+    Effects effect = Effects(6);
+
+    bool isCharged();
+};
+
+
+class Spawner {
+public:
+    Spawner(Level* level) : level(level) {
+        pfP = PathFinder(level, { {0, 1}, {4, 1}, {6, 1} });
+        pfE = PathFinder(level, { {0, 1}, {6, 1}, {1, 2}, { 2, 3 } });
+        pfEA = PathFinder(level, { {0, 1}, {6, 1}, {1, 2}, { 2, 3 }, { 3, 1 }, { 4, 1 } });
+        pfEB = PathFinder(level, { {0, 1}, {6, 1}, {1, 2}, { 2, 3 }, { 3, 1 } });
+    };
+    void spawn(int*);
+private:
+    Level* level;
+    PathFinder pfP, pfE, pfEA, pfEB;
+
+    void spawnPlayer(int, sf::Vector2i);
+    void spawnRobot1(sf::Vector2i);
+    void spawnRobot2(sf::Vector2i);
+    void spawnRobot3(sf::Vector2i);
+    void spawnRobot4(sf::Vector2i);
+    void spawnRobot5(sf::Vector2i);
 };
