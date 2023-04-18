@@ -862,10 +862,10 @@ void Menu::fileNameScreen(sf::RenderWindow& window, int* map) {
                     }
                     infile.close();
                     std::string& fourth_line = lines[3];
-                    std::stringstream ss(fourth_line);
+                    std::stringstream ss1(fourth_line);
                     std::vector<std::string> values;
                     std::string value;
-                    while (std::getline(ss, value, ',')) {
+                    while (std::getline(ss1, value, ',')) {
                         values.push_back(value);
                     }
                     values[std::stoi(words[0])] = words[1];
