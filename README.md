@@ -10,11 +10,11 @@ You are a retired intelligence sergeant who has been reinstated and sent on a mi
 
 ## Rules
 The player must destroy robot opponents in the level. The enemies are trying to destroy the player's headquarters. The player wins if he managed to kill all the enemies. Robots win if they destroy the headquarter or the player runs out of lives.
-![image](https://github.com/betelgeuse23/ByteBack-TheRobotUprising/assets/73065411/7373ebc0-1035-467d-8c2f-fa36811d678e)
+![image](https://github.com/betelgeuse23/ByteBack-TheRobotUprising/assets/73065411/92448086-bfd5-40bf-aa26-92fdb58d4b87)
 ## Multiplayer
 In addition, the game has local co-op. Before starting the game, you can choose a level and customize your character.
-![image](https://github.com/betelgeuse23/ByteBack-TheRobotUprising/assets/73065411/3453381e-df1e-43ab-a02e-76b7dc5e2ad3)
-![image](https://github.com/betelgeuse23/ByteBack-TheRobotUprising/assets/73065411/25db51a3-0c06-43cd-ac54-4c6b4c096319)
+![image](https://github.com/betelgeuse23/ByteBack-TheRobotUprising/assets/73065411/992f494b-899c-43fc-9a8f-8b4188bc933e)
+![image](https://github.com/betelgeuse23/ByteBack-TheRobotUprising/assets/73065411/13d4545e-ff70-45a9-962a-a8f80cb32abc)
 ## Level Editor
 You can create up to three unique levels in the built-in editor that supports all kinds of obstacles and enemies. Have fun!
 ![image](https://github.com/betelgeuse23/ByteBack-TheRobotUprising/assets/73065411/923ba5a8-ca48-4b15-b8b5-06a4cc5c339a)
